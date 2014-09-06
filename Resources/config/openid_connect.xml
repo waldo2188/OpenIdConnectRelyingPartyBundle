@@ -1,0 +1,76 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    
+    <parameters>
+        <parameter key="waldo_oic_rp.authentication.provider.class">Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Authentication\Provider\OICProvider</parameter>
+        <parameter key="waldo_oic_rp.authentication.listener.class">Waldo\OpenIdConnect\RelyingPartyBundle\Security\Http\Firewall\OICListener</parameter>
+        <parameter key="waldo_oic_rp.authentication.entrypoint.class">Waldo\OpenIdConnect\RelyingPartyBundle\Security\Http\EntryPoint\OICEntryPoint</parameter>
+        
+        <parameter key="waldo_oic_rp.user.provider.class">Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\User\OICUserProvider</parameter>
+        
+        <parameter key="waldo_oic_rp.abstract_resource_owner.generic.class">Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect\ResourceOwner\AbstractGenericOICResourceOwner</parameter>
+        <parameter key="waldo_oic_rp.resource_owner.generic.class">Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect\ResourceOwner\GenericOICResourceOwner</parameter>
+        
+        <parameter key="waldo_oic_rp.validator.id_token.class">Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect\Constraint\IDTokenValidator</parameter>
+        
+        <parameter key="waldo_oic_rp.http_client_response_handler.class">Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect\Response\OICResponseHandler</parameter>
+        
+        <parameter key="waldo_oic_rp.jwk_handler.class">Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect\JWK\JWKSetHandler</parameter>
+        
+        <parameter key="waldo_oic_rp.helper.nonce.class">Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect\NonceHelper</parameter>
+    </parameters>
+
+    <services>
+        <service id="waldo_oic_rp.authentication.listener" class="%waldo_oic_rp.authentication.listener.class%"
+                        parent="security.authentication.listener.abstract" public="false" abstract="true" />
+        
+        
+        <service id="waldo_oic_rp.authentication.provider" class="%waldo_oic_rp.authentication.provider.class%" public="false" />
+        
+        <service id="waldo_oic_rp.authentication.entrypoint" class="%waldo_oic_rp.authentication.entrypoint.class%" public="false" abstract="true">
+            <argument type="service" id="security.http_utils" />
+        </service>
+        
+        <service id="waldo_oic_rp.validator.id_token" class="%waldo_oic_rp.validator.id_token.class%">
+            <argument type="collection" /><!-- options -->
+        </service>
+        
+        <service id="waldo_oic_rp.http_client_response_handler" class="%waldo_oic_rp.http_client_response_handler.class%">
+            <argument type="service" id="waldo_oic_rp.jwk_handler" />
+            <argument type="collection" /><!-- options -->
+        </service>
+        
+        <service id="waldo_oic_rp.jwk_handler" class="%waldo_oic_rp.jwk_handler.class%" public="false">
+            <argument type="string" />
+            <argument type="string" />
+            <argument type="string">%kernel.cache_dir%</argument>
+            <argument type="service" id="waldo_oic_rp.http_client" />
+        </service>
+        
+        <service id="waldo_oic_rp.helper.nonce" class="%waldo_oic_rp.helper.nonce.class%">
+            <argument type="service" id="session" />
+        </service>
+        
+        <!-- User provider -->
+        
+        <service id="waldo_oic_rp.user.provider" class="%waldo_oic_rp.user.provider.class%" public="false" />
+        
+        <!-- Resource owners -->
+
+        <service id="waldo_oic_rp.abstract_resource_owner.generic" abstract="true">
+            <argument type="service" id="security.context" />
+            <argument type="service" id="security.http_utils" />
+            <argument type="service" id="waldo_oic_rp.http_client" />
+            <argument type="service" id="waldo_oic_rp.validator.id_token" />
+            <argument type="service" id="waldo_oic_rp.http_client_response_handler" />
+            <argument type="service" id="waldo_oic_rp.helper.nonce" />
+            <argument type="collection" /><!-- options -->
+        </service>
+        
+    </services>
+    
+</container>
