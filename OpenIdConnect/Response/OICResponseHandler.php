@@ -161,7 +161,7 @@ class OICResponseHandler
                 
                 try {
                     
-                    $valid = $jws->verify($jwkSet);
+                    $jws->verify($jwkSet);
                     
                 } catch (\Exception $e) {
                     throw new OICException\InvalidIdSignatureException($e->getMessage());                    
