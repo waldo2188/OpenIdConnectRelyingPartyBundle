@@ -17,14 +17,14 @@
     "target-dir": "Waldo/OpenIdConnect/RelyingPartyBundle",
     "extra": {
         "branch-alias": {
-            "dev-master": "0.0.x-dev"
+            "dev-master": "dev-master"
         }
     },
     "require": {
         "php": ">=5.3.3",
         "symfony/symfony": ">=2.3",
         "kriswallsmith/buzz": "~0.7",
-        "gree/jose": "dev-master"
+        "gree/jose": "0.1.*"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.2"
