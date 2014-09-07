@@ -17,7 +17,7 @@
     "target-dir": "Waldo/OpenIdConnect/RelyingPartyBundle",
     "extra": {
         "branch-alias": {
-            "dev-master": "dev-master"
+            "dev-master": "master-dev"
         }
     },
     "require": {
