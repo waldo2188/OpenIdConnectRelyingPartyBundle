@@ -1,7 +1,7 @@
 OpenID Connect Relying Party Bundle
 ===================================
 
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/75b154ce-60c0-45f3-89c7-e23770e83eaa/mini.png)](https://insight.sensiolabs.com/projects/75b154ce-60c0-45f3-89c7-e23770e83eaa) 
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/f839cce9-6b63-4af9-aea1-421ccec2cef3/mini.png)](https://insight.sensiolabs.com/projects/f839cce9-6b63-4af9-aea1-421ccec2cef3)
 [![Build Status](https://travis-ci.org/waldo2188/OpenIdConnectRelyingPartyBundle.svg?branch=master)](https://travis-ci.org/waldo2188/OpenIdConnectRelyingPartyBundle)
 
 OpenID Connect Relying Party is an implementation of [OpenID Connect Specification](http://openid.net/specs/openid-connect-basic-1_0.html).
