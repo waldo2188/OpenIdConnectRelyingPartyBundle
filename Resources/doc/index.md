@@ -2,39 +2,56 @@ OpenID Connect Relying Party Bundle
 ===================================
 
 ## Install
-Not a clue for at this time
+With Composer
+Add the code below to your composer.json
+```yaml
+    "require": {
+        "gree/jose": "0.1.7",
+        "waldo/openid-connect-relying-party-bundle": "dev-master"
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "git@github.com:waldo2188/OpenIdConnectRelyingPartyBundle.git"
+        },
+        {
+            "type": "git",
+            "url": "git@github.com:waldo2188/jose.git"
+        }
+    ]
+```
 
 ## Configurations
 ```yaml
 #/app/config/config.yml
 
 waldo_oic_rp:
-    http_client:
+    http_client:                    #Configuration for Buzz
         timeout: 5
         verify_peer: null
         max_redirects: 5
         proxy: null
     base_url: http://my-web-site.tld/
-    client_id: my_client_id #OpenID Connect client id given by the OpenId Connect Provider
+    client_id: my_client_id         #OpenID Connect client id given by the OpenId Connect Provider
     client_secret: my_client_secret #OpenID Connect client secret given by the OpenId Connect Provider
     issuer: https://openid-connect-provider.tld #URL of the OpenID Connect Provider
-    endpoints_url:  #Part of the URL of the OpenID Connect Provider
+    endpoints_url:                  #Part of the URL of the OpenID Connect Provider
         authorisation: /auth
         token: /token
         userinfo: /userinfo
-    display: page #How the authentication form will be display to the enduser
+    display: page                   #How the authentication form will be display to the enduser
     scope: openid profile email address phone #List of the scope you need
-    authentication_ttl: 300 #Maximum age of the authentication
-    token_ttl: 300 #Maximum age for tokenID
+    authentication_ttl: 300         #Maximum age of the authentication
+    token_ttl: 300                  #Maximum age for tokenID
     userinfo_signed_response_alg: null #Algorihme for signing userinfo response (RS256)
     id_token_signed_response_alg: null #Algorihme for signing tokenID response (RS256)
     jwk_url: https://openid-connect-provider.tld/op.jwk #URL to the Json Web Key of OpenID Connect Provider
-    jwk_cache_ttl 86400 #Validity periods in second where the JWK is valid
+    jwk_cache_ttl 86400             #Validity periods in second where the JWK store in cache is valid
 ```
 
 I recommend you to set a path for `default_target_path`. Because you risk to 
 suffer redirection loop.
-You must maybe set a path for `login_path`, the same as `default_target_path` 
+You must maybe set a path for `login_path`, the same as `default_target_path`, 
 is a good start.
 ```yaml
 #/app/config/security.yml
@@ -81,16 +98,13 @@ he will be automatically  redirected to the OpenId Connect Provider's login page
 
 
 
-TODO
-====
-Add logout mechanism
-Add re-authentication mechanism
+###TODO
+ - Add logout mechanism
+ - Add re-authentication mechanism
 
-Not yet implemented
-===================
+###Not yet implemented
+#####Client Prepares Authentication Request
 
-Client Prepares Authentication Request
----------------------------------------
 http://openid.net/specs/openid-connect-basic-1_0.html#AuthenticationRequest
 
 This options parrameter need to be implemented
@@ -100,8 +114,8 @@ This options parrameter need to be implemented
  - acr_values
 
 
-ID Token Validation 
--------------------
+#####ID Token Validation 
+
 http://openid.net/specs/openid-connect-basic-1_0.html#IDTokenValidation
 
 The point 7 is not implemented.
