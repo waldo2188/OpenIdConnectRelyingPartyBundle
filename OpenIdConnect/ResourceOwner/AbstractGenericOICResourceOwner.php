@@ -15,7 +15,6 @@ use Buzz\Message\Response as HttpClientResponse;
 use Buzz\Message\RequestInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 
 /**
@@ -143,9 +142,6 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
         $oicToken = new OICToken();
 
         $this->getIdTokenAndAccessToken($request, $oicToken, $code);
-
-
-        //$this->getEndUserinfo($request, $oicToken);
 
         return $oicToken;
     }
