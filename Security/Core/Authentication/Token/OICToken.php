@@ -2,8 +2,9 @@
 
 namespace Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Authentication\Token;
 
-use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\User\OICUser;
+use Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect\ResourceOwnerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 
 /**
  * OpenId Connect Token
@@ -11,7 +12,7 @@ use Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\User\OICUser;
  * @author valérian Girard <valerian.girard@educagri.fr>
  */
 class OICToken extends AbstractToken
-{
+{    
     /**
      * @var array
      */
@@ -58,10 +59,11 @@ class OICToken extends AbstractToken
     public function __construct(array $roles = array())
     {
         parent::__construct($roles);
-
+        
         parent::setAuthenticated(count($roles) > 0);
     }
-
+    
+    
     /**
      * {@inheritDoc}
      */
@@ -90,7 +92,11 @@ class OICToken extends AbstractToken
      * @param array $idToken The OpenId Connect ID Token
      */
     public function setIdToken($idToken)
-    {
+    {        
+        if($this->getUser() === null) {
+            $this->setUser(new OICUser($idToken->claims['sub']));
+        }
+        
         $this->idToken = $idToken;
     }
 

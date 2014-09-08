@@ -15,8 +15,8 @@ use Buzz\Message\Response as HttpClientResponse;
 use Buzz\Message\RequestInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 
 /**
  * GenericOICResourceOwner
@@ -25,11 +25,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
 {
-
-    /**
-     * @var SecurityContext 
-     */
-    private $securityContext;
 
     /**
      * @var HttpUtils 
@@ -61,13 +56,12 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
      */
     private $options = array();
 
-    public function __construct(SecurityContext $securityContext,
+    public function __construct(
             HttpUtils $httpUtils, AbstractCurl $httpClient, 
             ValidatorInterface $idTokenValidator, 
             OICResponseHandler $responseHandler, 
             NonceHelper $nonceHelper, $options)
     {
-        $this->securityContext = $securityContext;
         $this->httpUtils = $httpUtils;
         $this->httpClient = $httpClient;
         $this->idTokenValidator = $idTokenValidator;
@@ -140,20 +134,6 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
     /**
      * {@inheritDoc}
      */
-    public function isAuthenticated()
-    {
-
-        $token = $this->securityContext->getToken();
-
-        if ($token !== null && $token instanceof TokenInterface) {
-            return $token;
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function authenticateUser(Request $request)
     {
         $this->responseHandler->hasError($request->query->all());
@@ -164,7 +144,8 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
 
         $this->getIdTokenAndAccessToken($request, $oicToken, $code);
 
-        $this->getEndUserinfo($request, $oicToken);
+
+        //$this->getEndUserinfo($request, $oicToken);
 
         return $oicToken;
     }
@@ -182,14 +163,40 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
     {
         $this->nonceHelper->checkStateAndNonce($request);
 
-        $tokenEndpointUrl = $this->getTokenEndpointUrl();
-
         $postParameters = array(
             'grant_type' => 'authorization_code',
             'code' => $code
         );
-
-        $postParametersQuery = http_build_query($postParameters);
+        
+        $this->retrieveIdTokenAndAccessToken($oicToken, $postParameters);
+        
+    }
+    
+    /**
+     * Call the OpenID Connect Provider to exchange a refresh_token value against an id_token and an access_token
+     * 
+     * @param \Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Authentication\Token\OICToken $oicToken
+     */
+    protected function refreshToken(OICToken $oicToken)
+    {
+        $postParameters = array(
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $oicToken->getRefreshToken()
+        );
+        
+        $this->retrieveIdTokenAndAccessToken($oicToken, $postParameters);
+    }
+    
+    /**
+     * makes the request to the OpenID Connect Provider for get back an Access Token and an ID Token
+     * 
+     * @param \Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Authentication\Token\OICToken $oicToken
+     * @param type $parameters
+     * @throws InvalidIdTokenException
+     */
+    private function retrieveIdTokenAndAccessToken(OICToken $oicToken, $parameters)
+    {
+        $postParametersQuery = http_build_query($parameters);
 
         $headers = array(
             'User-Agent: WaldoOICRelyingPartyhBundle',
@@ -197,7 +204,7 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
             'Content-Length: ' . strlen($postParametersQuery)
         );
 
-        $request = new HttpClientRequest(RequestInterface::METHOD_POST, $tokenEndpointUrl);
+        $request = new HttpClientRequest(RequestInterface::METHOD_POST, $this->getTokenEndpointUrl());
         $request->setHeaders($headers);
         $request->setContent($postParametersQuery);
 
@@ -216,16 +223,24 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
         $oicToken->setRawTokenData($content);
     }
 
+    
     /**
      * Call the OpenId Connect Provider to get userinfo against an access_token
      * 
      * @see http://openid.net/specs/openid-connect-basic-1_0.html#UserInfo
      * 
-     * @param \Symfony\Component\HttpFoundation\Request $request
      * @param \Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Authentication\Token\OICToken $oicToken
      */
-    protected function getEndUserinfo(Request $request, OICToken $oicToken)
+    public function getEndUserinfo(OICToken $oicToken)
     {
+        if(!$this->idTokenValidator->isValid($oicToken->getIdToken())) {
+            if($oicToken->getRefreshToken()) {
+                $this->refreshToken($oicToken);
+            } else {
+                throw new AuthenticationServiceException("The ID Token has expired, we can't get End User info");
+            }
+        }
+
         if ($oicToken->getAccessToken() === null) {
             throw new InvalidRequestException("no such access_token");
         }
@@ -252,6 +267,8 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
         }
         
         $oicToken->setRawUserinfo($content);
+
+        return $content;
     }
 
 }

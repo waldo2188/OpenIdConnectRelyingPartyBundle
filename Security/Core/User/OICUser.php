@@ -25,11 +25,17 @@ class OICUser implements AdvancedUserInterface, \Serializable, EquatableInterfac
     protected $attributes = array();
 
     /**
+     * @var array
+     */
+    protected $roles = array();
+
+    /**
      * @param string $username
      */
-    public function __construct($username, $attributes = null)
+    public function __construct($username, $roles = null, $attributes = null)
     {
         $this->username = $username;
+        $this->roles = $roles;
         $this->attributes = $attributes;
     }
 
@@ -38,7 +44,10 @@ class OICUser implements AdvancedUserInterface, \Serializable, EquatableInterfac
      */
     public function getRoles()
     {
-        return array('ROLE_USER', 'ROLE_OIC_USER');
+        if(count($this->roles) == 0) {
+            return array('ROLE_USER', 'ROLE_OIC_USER');
+        }
+        return $this->roles;
     }
 
     public function __get($name)

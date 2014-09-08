@@ -15,6 +15,27 @@ use Symfony\Component\DependencyInjection\Reference;
 class OICFactory extends AbstractFactory
 {
 
+    public function addConfiguration(\Symfony\Component\Config\Definition\Builder\NodeDefinition $node)
+    {
+        parent::addConfiguration($node);
+        
+        $node->children()
+                ->scalarNode('create_users')->defaultFalse()->end()
+                ->arrayNode('created_users_roles')
+                    ->treatNullLike(array())
+                    ->beforeNormalization()
+                        ->ifTrue(function($v) { return !is_array($v); })
+                        ->then(function($v) { return array($v); })
+                    ->end()
+                    ->prototype('scalar')->end()
+                    ->defaultValue(array("ROLE_OIC_USER"))
+                ->end()
+                
+            ->end()
+        ;
+    }
+
+    
     /**
      * {@inheritDoc}
      */
@@ -25,6 +46,9 @@ class OICFactory extends AbstractFactory
         $container
                 ->setDefinition($providerId, new DefinitionDecorator('waldo_oic_rp.authentication.provider'))
                 ->addArgument(new Reference($userProviderId))
+                ->addArgument(new Reference('waldo_oic_rp.resource_owner.generic'))
+                ->addArgument($config['create_users'])
+                ->addArgument($config['created_users_roles'])
         ;
 
         return $providerId;
@@ -55,6 +79,7 @@ class OICFactory extends AbstractFactory
         $container
                 ->getDefinition($listenerId)
                 ->addMethodCall('setResourceOwner', array(new Reference('waldo_oic_rp.resource_owner.generic')))
+                ->addMethodCall('setSecurityContext', array(new Reference('security.context')))
         ;
 
         return $listenerId;

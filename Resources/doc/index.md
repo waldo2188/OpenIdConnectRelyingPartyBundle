@@ -75,6 +75,8 @@ security:
                 login_path: /private-page
                 target_path_parameter: ~
                 use_referer: ~
+                create_users: true              #create user if not found
+                created_users_roles: ROLE_OIC_USER #Add this role(s) to new User
     
     access_control:
         - { path: ^/private-page, roles: ROLE_OIC_USER }

@@ -3,6 +3,7 @@
 namespace Waldo\OpenIdConnect\RelyingPartyBundle\Security\Http\Firewall;
 
 use Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect\ResourceOwnerInterface;
+use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Http\Firewall\AbstractAuthenticationListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -14,6 +15,10 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  */
 class OICListener extends AbstractAuthenticationListener
 {
+    /**
+     * @var SecurityContext 
+     */
+    private $securityContext;
 
     /**
      * @var ResourceOwnerInterface  
@@ -27,16 +32,26 @@ class OICListener extends AbstractAuthenticationListener
     {
         $this->resourceOwner = $resourceOwner;
     }
+    
+    /**
+     * @param \Symfony\Component\Security\Core\SecurityContext $securityContext
+     */
+    public function setSecurityContext(SecurityContext $securityContext)
+    {
+        $this->securityContext = $securityContext;
+    }
 
+    
     /**
      * {@inheritDoc}
      */
-    protected function attemptAuthentication(Request $request) {
+    protected function attemptAuthentication(Request $request)
+    {
 
-        if($token = $this->resourceOwner->isAuthenticated()) {
-            return $token;
+        if ($this->securityContext->getToken() && $this->securityContext->getToken()->isAuthenticated()) {
+            return $this->securityContext->getToken();
         }
-        
+
         if ($request->query->count() == 0) {
             $uri = $this->resourceOwner->getAuthenticationEndpointUrl($request);
             return new RedirectResponse($uri);

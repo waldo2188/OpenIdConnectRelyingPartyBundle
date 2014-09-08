@@ -38,21 +38,6 @@ class AbstractGenericOICResourceOwnerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("http://oic.com/userinfo", $resourseOwner->getUserinfoEndpointUrl());
     }
     
-    public function testIsAuthenticated()
-    {
-        $resourseOwner = $this->createGenericOICResourceOwner(null, $this->getMock("Symfony\Component\Security\Core\Authentication\Token\TokenInterface"));
-        
-        $this->assertInstanceOf("Symfony\Component\Security\Core\Authentication\Token\TokenInterface",
-                $resourseOwner->isAuthenticated());
-    }
-    
-    public function testIsNotAuthenticated()
-    {
-        $resourseOwner = $this->createGenericOICResourceOwner();
-        
-        $this->assertFalse($resourseOwner->isAuthenticated());
-    }
-    
     public function testShouldAuthenticateUser()
     {
         $responseHandler = $this->getMockBuilder('Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect\Response\OICResponseHandler')
@@ -68,15 +53,8 @@ class AbstractGenericOICResourceOwnerTest extends \PHPUnit_Framework_TestCase
                     'expires_in' => 'expires_in_value',
                     'id_token' => $jwt
         ));
-        $responseHandler->expects($this->once())
-                ->method('handleEndUserinfoResponse')
-                ->willReturn(array(
-                    'sub' => 'amy.pond',
-                    'name' => 'Amelia Pond',
-                    'phone_number' => '123-456-7890'
-        ));
 
-        $resourseOwner = $this->createGenericOICResourceOwner(null, null, true, $responseHandler);
+        $resourseOwner = $this->createGenericOICResourceOwner(null, true, $responseHandler);
         
         $request = new Request();
         $request->query->set('code', "anOicCode");
@@ -97,7 +75,7 @@ class AbstractGenericOICResourceOwnerTest extends \PHPUnit_Framework_TestCase
         
         $jwt = new \JOSE_JWT(array('sub'=>'amy.pond'));
         
-        $resourseOwner = $this->createGenericOICResourceOwner(null, null, false);
+        $resourseOwner = $this->createGenericOICResourceOwner(null, false);
         
         $request = new Request();
         $request->query->set('code', "anOicCode");
@@ -105,25 +83,23 @@ class AbstractGenericOICResourceOwnerTest extends \PHPUnit_Framework_TestCase
         $resourseOwner->authenticateUser($request);
     }
     
+
     /**
      * @expectedException Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Exception\InvalidRequestException
      * @expectedExceptionMessage "no such access_token"
      */
-    public function testShouldFailAuthenticateUserNoAccessToken()
+    public function testShouldFailAuthenticateUserNoSuchAccessToken()
     {
         $responseHandler = $this->getMockBuilder('Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect\Response\OICResponseHandler')
                 ->disableOriginalConstructor()->getMock();
-        
-        $jwt = new \JOSE_JWT(array('sub'=>'amy.pond'));
-        
-        $resourseOwner = $this->createGenericOICResourceOwner(null, null, true);
-        
-        $request = new Request();
-        $request->query->set('code', "anOicCode");
-        
-        $resourseOwner->authenticateUser($request);
-    }
+               
+        $resourseOwner = $this->createGenericOICResourceOwner(null, true, $responseHandler);
 
+        $oicToken = new \Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Authentication\Token\OICToken();
+        
+        $resourseOwner->getEndUserinfo($oicToken);
+    }
+    
     /**
      * @expectedException Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Exception\InvalidIdTokenException
      * @expectedExceptionMessage "The sub value is not equal"
@@ -132,30 +108,17 @@ class AbstractGenericOICResourceOwnerTest extends \PHPUnit_Framework_TestCase
     {
         $responseHandler = $this->getMockBuilder('Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect\Response\OICResponseHandler')
                 ->disableOriginalConstructor()->getMock();
+                
+        $resourseOwner = $this->createGenericOICResourceOwner(null, true, $responseHandler);
+
+        $claims = new \stdClass();
+        $claims->claims = array('sub' => "username");
         
+        $oicToken = new \Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Authentication\Token\OICToken();
+        $oicToken->setAccessToken("plop");
+        $oicToken->setIdToken($claims);
         
-        $jwt = new \JOSE_JWT(array('sub'=>'amy.pond'));
-        
-        $responseHandler->expects($this->once())
-                ->method('handleTokenAndAccessTokenResponse')
-                ->willReturn(array(
-                    'access_token' => 'access_token_value',
-                    'refresh_token' => 'refresh_token_value',
-                    'expires_in' => 'expires_in_value',
-                    'id_token' => $jwt
-        ));
-        $responseHandler->expects($this->once())
-                ->method('handleEndUserinfoResponse')
-                ->willReturn(array(
-                    'sub' => 'rory.williams',
-        ));
-        
-        $resourseOwner = $this->createGenericOICResourceOwner(null, null, true, $responseHandler);
-        
-        $request = new Request();
-        $request->query->set('code', "anOicCode");
-        
-        $resourseOwner->authenticateUser($request);
+        $resourseOwner->getEndUserinfo($oicToken);
     }
     
     public function testShouldReturnName()
@@ -169,16 +132,9 @@ class AbstractGenericOICResourceOwnerTest extends \PHPUnit_Framework_TestCase
     
     private function createGenericOICResourceOwner(
             $httpUtilsRV = "", 
-            $securityContextReturnValue = null, 
             $idTokenValidatorRV= true,
             $responseHandler = null)
-    {
-        $securityContext = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
-                ->disableOriginalConstructor()->getMock();
-        $securityContext->expects($this->any())
-                ->method('getToken')
-                ->willReturn($securityContextReturnValue);
-                
+    {               
         
         $httpUtils = $this->getMockBuilder('\Symfony\Component\Security\Http\HttpUtils')
                 ->disableOriginalConstructor()->getMock();
@@ -203,7 +159,6 @@ class AbstractGenericOICResourceOwnerTest extends \PHPUnit_Framework_TestCase
                 ->disableOriginalConstructor()->getMock();
         
         return new GenericOICResourceOwner(
-                $securityContext,
                 $httpUtils,
                 $httpClient,
                 $idTokenValidator,

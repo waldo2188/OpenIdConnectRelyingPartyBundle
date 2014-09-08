@@ -2,6 +2,7 @@
 
 namespace Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect;
 
+use Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Authentication\Token\OICToken;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -34,19 +35,22 @@ interface ResourceOwnerInterface
     public function getUserinfoEndpointUrl();
 
     /**
-     * Check if user is already authenticated
-     * 
-     * @return Symfony\Component\Security\Core\Authentication\Token\TokenInterface | boolean
-     */
-    public function isAuthenticated();
-
-    /**
      * Use the code parameter set in request query for retrieve the enduser informations
      * 
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @return \Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Authentication\Token\OICToken
      */
     public function authenticateUser(Request $request);
+    
+    /**
+     * Call the OpenId Connect Provider to get userinfo against an access_token
+     * 
+     * @see http://openid.net/specs/openid-connect-basic-1_0.html#UserInfo
+     * 
+     * @param \Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Authentication\Token\OICToken $oicToken
+     * @return array
+     */
+    public function getEndUserinfo(OICToken $oicToken);
 
     /**
      * Return a name for the resource owner.

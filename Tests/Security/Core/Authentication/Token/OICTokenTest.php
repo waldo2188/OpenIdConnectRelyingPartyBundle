@@ -37,12 +37,12 @@ class OICTokenTest extends \PHPUnit_Framework_TestCase
     public function testSetRawTokenDataShouldBeSet()
     {
         $oicToken = new OICToken();
-
+        
         $expected = array(
             'access_token' => 'access_token_value',
             'refresh_token' => 'refresh_token_value',
             'expires_in' => 'expires_in_value',
-            'id_token' => 'id_token_value'
+            'id_token' => $this->getIdToken()
         );
 
         $oicToken->setRawTokenData($expected);
@@ -89,7 +89,7 @@ class OICTokenTest extends \PHPUnit_Framework_TestCase
             'access_token' => 'access_token_value',
             'refresh_token' => 'refresh_token_value',
             'expires_in' => 'expires_in_value',
-            'id_token' => 'id_token_value'
+            'id_token' => $this->getIdToken()
         );
 
         $oicToken->setRawTokenData($expected);
@@ -100,6 +100,13 @@ class OICTokenTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected['refresh_token'], $unserialized->getRefreshToken());
         $this->assertEquals($expected['expires_in'], $unserialized->getExpiresIn());
         $this->assertEquals($expected['id_token'], $unserialized->getIdToken());        
+    }
+    
+    private function getIdToken()
+    {
+        $claims = new \stdClass();
+        $claims->claims = array('sub' => "username");
+        return $claims;
     }
 
 }

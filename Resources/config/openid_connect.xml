@@ -57,12 +57,13 @@
         
         <!-- User provider -->
         
-        <service id="waldo_oic_rp.user.provider" class="%waldo_oic_rp.user.provider.class%" public="false" />
+        <service id="waldo_oic_rp.user.provider" class="%waldo_oic_rp.user.provider.class%" public="false">
+            <argument type="service" id="session" />
+        </service>
         
         <!-- Resource owners -->
 
         <service id="waldo_oic_rp.abstract_resource_owner.generic" abstract="true">
-            <argument type="service" id="security.context" />
             <argument type="service" id="security.http_utils" />
             <argument type="service" id="waldo_oic_rp.http_client" />
             <argument type="service" id="waldo_oic_rp.validator.id_token" />

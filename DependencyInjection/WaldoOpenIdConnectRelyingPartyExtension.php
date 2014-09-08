@@ -90,7 +90,7 @@ class WaldoOpenIdConnectRelyingPartyExtension extends Extension
         $definition->setClass("%waldo_oic_rp.resource_owner.$name.class%");
 
         $container->setDefinition("waldo_oic_rp.resource_owner." . $name, $definition);
-        $definition->replaceArgument(6, $config);
+        $definition->replaceArgument(5, $config);
     }
 
 }
