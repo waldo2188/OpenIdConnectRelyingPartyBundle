@@ -5,7 +5,6 @@ namespace Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Authentication\Pr
 use Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Authentication\Token\OICToken;
 use Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\User\UserFactoryInterface;
 use Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect\ResourceOwnerInterface;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -13,6 +12,8 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\ChainUserProvider;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
  * OICProvider
