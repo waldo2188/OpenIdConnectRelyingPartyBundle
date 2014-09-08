@@ -47,7 +47,6 @@ class OICListener extends AbstractAuthenticationListener
      */
     protected function attemptAuthentication(Request $request)
     {
-
         if ($this->securityContext->getToken() && $this->securityContext->getToken()->isAuthenticated()) {
             return $this->securityContext->getToken();
         }
@@ -56,8 +55,10 @@ class OICListener extends AbstractAuthenticationListener
             $uri = $this->resourceOwner->getAuthenticationEndpointUrl($request);
             return new RedirectResponse($uri);
         }
-
-        return $this->resourceOwner->authenticateUser($request);
+        
+        $oicToken = $this->resourceOwner->authenticateUser($request);
+        
+        return $this->authenticationManager->authenticate($oicToken);
     }
 
 }

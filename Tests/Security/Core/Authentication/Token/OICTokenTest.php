@@ -18,7 +18,7 @@ class OICTokenTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($oicToken->isAuthenticated());
 
         $oicToken = new OICToken(array("ROLE_FAKE"));
-        $this->assertTrue($oicToken->isAuthenticated());
+        $this->assertFalse($oicToken->isAuthenticated());
     }
 
     public function testSetRawTokenDataShouldBeEmpty()

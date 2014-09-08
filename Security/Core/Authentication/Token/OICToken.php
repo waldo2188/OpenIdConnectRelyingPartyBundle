@@ -58,8 +58,6 @@ class OICToken extends AbstractToken
     public function __construct(array $roles = array())
     {
         parent::__construct($roles);
-        
-        parent::setAuthenticated(count($roles) > 0);
     }
     
     

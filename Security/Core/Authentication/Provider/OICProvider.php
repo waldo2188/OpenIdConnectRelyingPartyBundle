@@ -44,6 +44,11 @@ class OICProvider implements AuthenticationProviderInterface
     private $createdUsersRoles;
 
     /**
+     * @var array
+     */
+    private $hideUserNotFound = false;
+
+    /**
      * @var bool
      */
     private $createUsers = true;
@@ -69,7 +74,7 @@ class OICProvider implements AuthenticationProviderInterface
         }
 
         $this->token = $token;
-        
+
         $user = $this->provideUser($this->token->getUsername());
 
         if ($user->getUsername() === $this->token->getUsername()) {
@@ -79,6 +84,7 @@ class OICProvider implements AuthenticationProviderInterface
             $relodedToken->setIdToken($this->token->getIdToken());
             $relodedToken->setRefreshToken($this->token->getRefreshToken());
             $relodedToken->setUser($user);
+            $relodedToken->setAuthenticated(true);
             
             return $relodedToken;
         }
