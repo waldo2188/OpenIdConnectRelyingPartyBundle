@@ -9,7 +9,7 @@ This Bundle is made for being fully integrated in Symfony2's environnement.
 
 ##What next ?
 
-- [Reead the documentation](Resources/doc/index.md)
+- [Read the documentation](Resources/doc/index.md)
 
 
 
