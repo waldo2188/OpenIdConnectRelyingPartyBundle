@@ -3,7 +3,6 @@
 namespace Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Authentication\Token;
 
 use Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\User\OICUser;
-use Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect\ResourceOwnerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 
 /**
