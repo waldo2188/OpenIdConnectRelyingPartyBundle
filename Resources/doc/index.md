@@ -36,7 +36,7 @@ waldo_oic_rp:
     client_secret: my_client_secret #OpenID Connect client secret given by the OpenId Connect Provider
     issuer: https://openid-connect-provider.tld #URL of the OpenID Connect Provider
     endpoints_url:                  #Part of the URL of the OpenID Connect Provider
-        authorisation: /auth
+        authorisztion: /auth
         token: /token
         userinfo: /userinfo
     display: page                   #How the authentication form will be display to the enduser

@@ -58,7 +58,7 @@ display: page
 prompt: login
 scope: openid
 endpoints_url:
-    authorisation: /auth
+    authorisztion: /auth
     token: /token
     userinfo: /userinfo
 http_client:

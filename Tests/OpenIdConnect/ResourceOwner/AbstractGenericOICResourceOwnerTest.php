@@ -171,7 +171,7 @@ class AbstractGenericOICResourceOwnerTest extends \PHPUnit_Framework_TestCase
                     "authentication_ttl" => "300",
                     "ui_locales" => "F_fr",
                     "endpoints_url" => array(
-                        "authorisation" => "http://oic.com/auth",
+                        "authorisztion" => "http://oic.com/auth",
                         "token" => "http://oic.com/token",
                         "userinfo" => "http://oic.com/userinfo"
                         )
