@@ -205,6 +205,12 @@ class OICResponseHandler
                 case 'unsupported_grant_type':
                     throw new OICException\UnsuportedGrantTypeException($content['error_description']);
                     break;
+                case 'unauthorized_client':
+                    throw new OICException\UnsuportedGrantTypeException($content['error_description']);
+                    break;
+                default :
+                    throw new OICException\UnsuportedGrantTypeException($content['error_description']);
+                    break;
             }
         }
         
