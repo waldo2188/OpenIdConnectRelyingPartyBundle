@@ -25,7 +25,6 @@ class WaldoOpenIdConnectRelyingPartyExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
-        $loader->load('services.xml');
         $loader->load('openid_connect.xml');
         $loader->load('buzz.xml');
 
