@@ -186,8 +186,14 @@ class OICResponseHandler
         if(!is_array($content)) {
             return false;
         }
-
+        
+        
         if(array_key_exists('error', $content)) {
+            
+            if(!array_key_exists('error_description', $content)) {
+                $content['error_description'] = $content['error'];
+            }
+            
             switch ($content['error']) {
                 case 'invalid request':
                 case 'invalid_request':
@@ -206,10 +212,10 @@ class OICResponseHandler
                     throw new OICException\UnsuportedGrantTypeException($content['error_description']);
                     break;
                 case 'unauthorized_client':
-                    throw new OICException\UnsuportedGrantTypeException($content['error_description']);
+                    throw new OICException\InvalidClientOrSecretException($content['error_description']);
                     break;
                 default :
-                    throw new OICException\UnsuportedGrantTypeException($content['error_description']);
+                    throw new OICException\InvalidRequestException($content['error_description']);
                     break;
             }
         }

@@ -32,6 +32,51 @@ class OICResponseHandlerTest extends \PHPUnit_Framework_TestCase
         $oicResponseHandler->handleHttpClientResponse($response);    
 
     }
+
+    /**
+     * @expectedException Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Exception\InvalidRequestException
+     * @expectedExceptionMessage bumber
+     */
+    public function testHandleUnknowError()
+    {
+        $response = new \Buzz\Message\Response();
+        
+        $header = array(
+            "HTTP/1.0 400 Bad Request",
+            "Content-Type: application/json");
+        $response->addHeaders($header);
+        $response->setContent('{"error":"bumb","error_description":"bumber"}');
+
+        $oicResponseHandler = new OICResponseHandler(
+                $this->createJWKSetHandler(),
+                array());
+        
+        $oicResponseHandler->handleHttpClientResponse($response);    
+
+    }
+
+    /**
+     * @expectedException Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Exception\InvalidRequestException
+     * @expectedExceptionMessage bumb
+     */
+    public function testHandleErrorWhithoutDescription()
+    {
+        $response = new \Buzz\Message\Response();
+        
+        $header = array(
+            "HTTP/1.0 400 Bad Request",
+            "Content-Type: application/json");
+        $response->addHeaders($header);
+        $response->setContent('{"error":"bumb"}');
+
+        $oicResponseHandler = new OICResponseHandler(
+                $this->createJWKSetHandler(),
+                array());
+        
+        $oicResponseHandler->handleHttpClientResponse($response);    
+
+
+    }
     
     
     /**
