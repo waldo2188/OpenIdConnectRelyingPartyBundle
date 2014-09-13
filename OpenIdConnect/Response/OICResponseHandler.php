@@ -50,8 +50,13 @@ class OICResponseHandler
     public function handleHttpClientResponse(HttpClientResponse $response)
     {  
         $content = $this->getContent($response);
-                
-        if($response->getStatusCode() >= Response::HTTP_BAD_REQUEST) {
+         
+        if($response->getStatusCode() >= Response::HTTP_UNAUTHORIZED) {
+            if(($authError = $response->getHeader("WWW-Authenticate")) !== null){
+                preg_match ('/^Basic realm="(.*)"$/', $authError, $matches);
+                $content = array('error' => "Authentication fail", 'error_description' => $matches[1]);                
+            }
+        }elseif($response->getStatusCode() >= Response::HTTP_BAD_REQUEST) {
             if(($bearerError = $response->getHeader("WWW-Authenticate")) !== null){
                 preg_match ('/^Bearer error="(.*)", error_description="(.*)"$/', $bearerError, $matches);
                 $content = array('error' => $matches[1], 'error_description' => $matches[1]);                
