@@ -14,6 +14,7 @@ class OICResponseHandlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Exception\InvalidRequestException
+     * @expectedExceptionMessage invalid request
      */
     public function testHandleHttpClientResponseBearerError()
     {
@@ -22,6 +23,28 @@ class OICResponseHandlerTest extends \PHPUnit_Framework_TestCase
         $header = array(
             "HTTP/1.0 400 Bad Request",
             'WWW-Authenticate: Bearer error="invalid request", error_description="an error description"',
+            "Content-Type: text/html");
+        $response->addHeaders($header);
+
+        $oicResponseHandler = new OICResponseHandler(
+                $this->createJWKSetHandler(),
+                array());
+        
+        $oicResponseHandler->handleHttpClientResponse($response);    
+
+    }
+    
+    /**
+     * @expectedException Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Exception\InvalidRequestException
+     * @expectedExceptionMessage Secured Area
+     */
+    public function testHandleHttpClientBasicAuthFailError()
+    {
+        $response = new \Buzz\Message\Response();
+
+        $header = array(
+            "HTTP/1.0 401 Unauthorized",
+            'WWW-Authenticate: Basic realm="Secured Area"',
             "Content-Type: text/html");
         $response->addHeaders($header);
 
