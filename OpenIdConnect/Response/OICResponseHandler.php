@@ -50,7 +50,7 @@ class OICResponseHandler
     public function handleHttpClientResponse(HttpClientResponse $response)
     {  
         $content = $this->getContent($response);
-         
+
         if($response->getStatusCode() >= Response::HTTP_UNAUTHORIZED) {
             if(($authError = $response->getHeader("WWW-Authenticate")) !== null){
                 preg_match ('/^Basic realm="(.*)"$/', $authError, $matches);
@@ -105,11 +105,11 @@ class OICResponseHandler
     public function handleEndUserinfoResponse(HttpClientResponse $response)
     {  
         $content = $this->handleHttpClientResponse($response);
-
         // Check if Userinfo Signed Response Alg
         if($this->options['userinfo_signed_response_alg'] !== null) {
+            
+            
             if($content instanceof \JOSE_JWT) {
-
                 return $content->claims;
                 
             } else {

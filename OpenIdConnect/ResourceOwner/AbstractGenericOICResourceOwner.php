@@ -134,7 +134,7 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
      * {@inheritDoc}
      */
     public function authenticateUser(Request $request)
-    {
+    {   
         $this->responseHandler->hasError($request->query->all());
 
         $code = $request->query->get('code');
@@ -190,10 +190,13 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
      * @param type $parameters
      * @throws InvalidIdTokenException
      */
-    private function retrieveIdTokenAndAccessToken(OICToken $oicToken, $parameters)
+    private function retrieveIdTokenAndAccessToken(OICToken $oicToken, $parameters, $redirectUri = 'login_check')
     {
+       
+        $parameters['redirect_uri'] = $this->httpUtils->generateUri(new Request(), $redirectUri);
+        
         $postParametersQuery = http_build_query($parameters);
-
+        
         $headers = array(
             'User-Agent: WaldoOICRelyingPartyhBundle',
             'Content-Type: application/x-www-form-urlencoded',
@@ -204,13 +207,14 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
         $request->setHeaders($headers);
         $request->setContent($postParametersQuery);
 
+                
         $response = new HttpClientResponse();
-
+        
         $this->httpClient->setOption(CURLOPT_USERPWD, $this->options['client_id'] . ':' . $this->options['client_secret']);
         $this->httpClient->send($request, $response);
-
+        
         $content = $this->responseHandler->handleTokenAndAccessTokenResponse($response);
-
+       
         // Apply validation describe here: http://openid.net/specs/openid-connect-basic-1_0.html#IDTokenValidation
         if (!$this->idTokenValidator->isValid($content['id_token'])) {
             throw new InvalidIdTokenException();
@@ -255,7 +259,7 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
         $this->httpClient->send($request, $response);
 
         $content = $this->responseHandler->handleEndUserinfoResponse($response);
-
+                
         // Check if the sub value return by the OpenID connect Provider is the 
         // same as previous. If Not, that isn't good...
         if ($content['sub'] !== $oicToken->getIdToken()->claims['sub']) {
