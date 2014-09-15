@@ -111,11 +111,11 @@ class Configuration implements ConfigurationInterface
             ->children()
                 // Endpoints URL are the part of the URL after the OpenId Connect Provider URL
                 // If OpenId Connect Provider URL is https://www.myoicop.com/iocp
-                // The authorisztion endpoint configuration is just /authorization 
+                // The authorization endpoint configuration is just /authorization 
                 ->arrayNode('endpoints_url')
                     ->isRequired()
                         ->children()
-                            ->scalarNode('authorisztion')
+                            ->scalarNode('authorization')
                                 ->validate()
                                     ->ifTrue(function($v) {
                                         return empty($v);

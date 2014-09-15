@@ -69,7 +69,7 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
 
 
         if (array_key_exists("endpoints_url", $options)) {
-            $options["authorisztion_endpoint_url"] = $options["endpoints_url"]["authorisztion"];
+            $options["authorization_endpoint_url"] = $options["endpoints_url"]["authorization"];
             $options["token_endpoint_url"] = $options["endpoints_url"]["token"];
             $options["userinfo_endpoint_url"] = $options["endpoints_url"]["userinfo"];
             unset($options["endpoints_url"]);
@@ -108,7 +108,7 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
 
         $httpRequest = new Request();
         $authenticationUri = $httpRequest->create(
-                        $this->options['authorisztion_endpoint_url'], RequestInterface::METHOD_GET, $urlParameters)
+                        $this->options['authorization_endpoint_url'], RequestInterface::METHOD_GET, $urlParameters)
                 ->getUri();
 
         return $authenticationUri;
