@@ -38,7 +38,9 @@ class IDTokenValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $validator = new IDTokenValidator($this->options);
 
-        $res = $validator->isValid($this->token);
+        $validator->setIdToken($this->token);
+        
+        $res = $validator->isValid();
         $this->assertTrue($res);
     }
     
@@ -46,8 +48,10 @@ class IDTokenValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $this->options['authentication_ttl'] = null;
         $validator = new IDTokenValidator($this->options);
-
-        $res = $validator->isValid($this->token);
+        
+        $validator->setIdToken($this->token);
+        
+        $res = $validator->isValid();
         $this->assertTrue($res);
     }
     
@@ -56,8 +60,10 @@ class IDTokenValidatorTest extends \PHPUnit_Framework_TestCase
         unset($this->token['claims']['auth_time']);
         
         $validator = new IDTokenValidator($this->options);
-
-        $res = $validator->isValid($this->token);
+        
+        $validator->setIdToken($this->token);
+        
+        $res = $validator->isValid();
         $this->assertFalse($res);
     }
     
@@ -67,7 +73,9 @@ class IDTokenValidatorTest extends \PHPUnit_Framework_TestCase
 
         $validator = new IDTokenValidator($this->options);
 
-        $res = $validator->isValid($this->token);
+        $validator->setIdToken($this->token);
+        
+        $res = $validator->isValid();
         $this->assertTrue($res);
     }
     
@@ -77,7 +85,9 @@ class IDTokenValidatorTest extends \PHPUnit_Framework_TestCase
 
         $validator = new IDTokenValidator($this->options);
 
-        $res = $validator->isValid($this->token);
+        $validator->setIdToken($this->token);
+        
+        $res = $validator->isValid();
         $this->assertTrue($res);
     }
     
@@ -86,7 +96,9 @@ class IDTokenValidatorTest extends \PHPUnit_Framework_TestCase
         $this->options['issuer'] = 'fake';
         $validator = new IDTokenValidator($this->options);
 
-        $res = $validator->isValid($this->token);
+        $validator->setIdToken($this->token);
+        
+        $res = $validator->isValid();
         $this->assertFalse($res);
     }
     
@@ -96,7 +108,9 @@ class IDTokenValidatorTest extends \PHPUnit_Framework_TestCase
         $this->token["claims"]['azp'] = new IDTokenValidator($this->options);
         $validator = new IDTokenValidator($this->options);
 
-        $res = $validator->isValid($this->token);
+        $validator->setIdToken($this->token);
+        
+        $res = $validator->isValid();
         $this->assertFalse($res);
     }
     
@@ -106,7 +120,9 @@ class IDTokenValidatorTest extends \PHPUnit_Framework_TestCase
         unset($this->token["claims"]['azp'] );
         $validator = new IDTokenValidator($this->options);
 
-        $res = $validator->isValid($this->token);
+        $validator->setIdToken($this->token);
+        
+        $res = $validator->isValid();
         $this->assertFalse($res);
     }
 

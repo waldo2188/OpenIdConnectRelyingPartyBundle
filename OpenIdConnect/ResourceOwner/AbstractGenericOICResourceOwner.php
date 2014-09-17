@@ -16,7 +16,8 @@ use Buzz\Message\RequestInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
-
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Psr\Log\LoggerInterface;
 /**
  * GenericOICResourceOwner
  *
@@ -54,18 +55,24 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
      * @var array
      */
     private $options = array();
+    
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     public function __construct(
             HttpUtils $httpUtils, AbstractCurl $httpClient, 
             ValidatorInterface $idTokenValidator, 
             OICResponseHandler $responseHandler, 
-            NonceHelper $nonceHelper, $options)
+            NonceHelper $nonceHelper, $options, LoggerInterface $logger = null)
     {
         $this->httpUtils = $httpUtils;
         $this->httpClient = $httpClient;
         $this->idTokenValidator = $idTokenValidator;
         $this->responseHandler = $responseHandler;
         $this->nonceHelper = $nonceHelper;
+        $this->logger = $logger;
 
 
         if (array_key_exists("endpoints_url", $options)) {
@@ -216,8 +223,20 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
         $content = $this->responseHandler->handleTokenAndAccessTokenResponse($response);
        
         // Apply validation describe here: http://openid.net/specs/openid-connect-basic-1_0.html#IDTokenValidation
-        if (!$this->idTokenValidator->isValid($content['id_token'])) {
+        $this->idTokenValidator->setIdToken($content['id_token']);
+        if (!$this->idTokenValidator->isValid()) {
+            
+            // check if the user session has expired
+            if($this->idTokenValidator->isValidAuthTime() === false) {
+                throw new AuthenticationException("auth_time as expired, user must login");
+            }
+            
+            if($this->logger !== null) {
+                $this->logger->error("InvalidIdTokenException", $content);
+            }
+            
             throw new InvalidIdTokenException();
+            
         }
 
         $oicToken->setRawTokenData($content);
@@ -233,7 +252,8 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
      */
     public function getEndUserinfo(OICToken $oicToken)
     {
-        if(!$this->idTokenValidator->isValid($oicToken->getIdToken())) {
+        $this->idTokenValidator->setIdToken($oicToken->getIdToken());
+        if(!$this->idTokenValidator->isValid()) {
             if($oicToken->getRefreshToken()) {
                 $this->refreshToken($oicToken);
             } else {
@@ -263,6 +283,10 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
         // Check if the sub value return by the OpenID connect Provider is the 
         // same as previous. If Not, that isn't good...
         if ($content['sub'] !== $oicToken->getIdToken()->claims['sub']) {
+            if($this->logger !== null) {
+                $this->logger->error("InvalidIdTokenException", $oicToken);
+            }
+            
             throw new InvalidIdTokenException("The sub value is not equal");
         }
         

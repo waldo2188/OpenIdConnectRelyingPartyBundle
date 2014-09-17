@@ -32,18 +32,20 @@ class IDTokenValidator implements ValidatorInterface
         $this->options = $options;
     }
 
+    public function setIdToken($idToken)
+    {
+        $this->idToken = $idToken;
+        $this->claims = is_object($idToken) ? $this->idToken->claims : $this->idToken['claims'];
+    }
+    
     /**
      * 
      * @param type $idToken
      * @return boolean
      */
-    public function isValid($idToken)
-    {
-        $this->idToken = $idToken;
-        $this->claims = is_object($idToken) ? $this->idToken->claims : $this->idToken['claims'];
-
+    public function isValid()
+    {        
         $isValid = true;
-
         
         /* 1. The Issuer Identifier for the OpenID Provider 
          * (which is typically obtained during Discovery) MUST exactly match 
@@ -100,7 +102,7 @@ class IDTokenValidator implements ValidatorInterface
         return (bool) $isValid;
     }
 
-    private function isClientIdInAudience($aud)
+    public function isClientIdInAudience($aud)
     {
         if (is_string($aud)) {
             return $this->options['client_id'] === $aud;
@@ -110,7 +112,7 @@ class IDTokenValidator implements ValidatorInterface
         return false;
     }
 
-    private function isMultipleAudienceValide($aud)
+    public function isMultipleAudienceValide($aud)
     {
         if (is_string($aud)) {
             return true;
@@ -128,7 +130,7 @@ class IDTokenValidator implements ValidatorInterface
         return false;
     }
     
-    private function isExpirationTimeValide()
+    public function isExpirationTimeValide()
     {
         $expirationTime = new \DateTime();
         $expirationTime->setTimestamp($this->claims['exp']);
@@ -136,7 +138,7 @@ class IDTokenValidator implements ValidatorInterface
         return new \DateTime("Now") < $expirationTime;
     }
     
-    private function isIatValide()
+    public function isIatValide()
     {
         $expirationTime = new \DateTime();
         $expirationTime->setTimestamp($this->claims['iat']);
@@ -145,7 +147,7 @@ class IDTokenValidator implements ValidatorInterface
         return new \DateTime("Now") < $expirationTime;
     }
     
-    private function isValidAuthTime()
+    public function isValidAuthTime()
     {
         if($this->options['authentication_ttl'] != null && $this->options['authentication_ttl'] > 0) {
             if(array_key_exists('auth_time', $this->claims)) {
@@ -157,7 +159,7 @@ class IDTokenValidator implements ValidatorInterface
                 return new \DateTime("Now") < $expirationAuthTime;
                 
             } else {
-                return false;
+                return null;
             }
         }
         

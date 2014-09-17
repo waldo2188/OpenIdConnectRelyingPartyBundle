@@ -70,6 +70,7 @@
             <argument type="service" id="waldo_oic_rp.http_client_response_handler" />
             <argument type="service" id="waldo_oic_rp.helper.nonce" />
             <argument type="collection" /><!-- options -->
+            <argument type="service" id="logger" on-invalid="null" />
         </service>
         
     </services>
