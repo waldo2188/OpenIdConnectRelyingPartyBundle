@@ -97,7 +97,7 @@ class IDTokenValidator implements ValidatorInterface
          * determines too much time has elapsed since the last End-User 
          * authentication. 
          */
-        $isValid &= $this->isValidAuthTime();
+        $isValid &= $this->isValidAuthTime() === false ? false : true;
 
         return (bool) $isValid;
     }

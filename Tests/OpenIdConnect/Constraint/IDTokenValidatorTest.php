@@ -55,7 +55,7 @@ class IDTokenValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($res);
     }
     
-    public function testAllSouldFailWithoutTime()
+    public function testAllSouldNotFailWithoutTime()
     {
         unset($this->token['claims']['auth_time']);
         
@@ -64,7 +64,7 @@ class IDTokenValidatorTest extends \PHPUnit_Framework_TestCase
         $validator->setIdToken($this->token);
         
         $res = $validator->isValid();
-        $this->assertFalse($res);
+        $this->assertTrue($res);
     }
     
     public function testAllSouldBeGoodAud()
