@@ -62,6 +62,11 @@ class OICUser implements AdvancedUserInterface, \Serializable, EquatableInterfac
     {
         $this->attributes[$name] = $value;
     }
+    
+    public function __isset($name)
+    {
+        return array_key_exists($name, $this->attributes);
+    }
 
     /**
      * {@inheritDoc}
