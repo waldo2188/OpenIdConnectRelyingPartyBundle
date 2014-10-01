@@ -166,7 +166,9 @@ class OICResponseHandler
                 
                 try {
                     
-                    $jws->verify($jwkSet);
+                    $jwk = $jwkSet->filterJwk("use", \JOSE_JWK::JWK_USE_SIG);
+    
+                    $jws->verify($jwk);
                     
                 } catch (\Exception $e) {
                     throw new OICException\InvalidIdSignatureException($e->getMessage());                    
