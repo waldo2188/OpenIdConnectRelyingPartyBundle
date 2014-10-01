@@ -149,7 +149,7 @@ class IDTokenValidator implements ValidatorInterface
     
     public function isValidAuthTime()
     {
-        if($this->options['authentication_ttl'] != null && $this->options['authentication_ttl'] > 0) {
+        if($this->options['authentication_ttl'] !== null && $this->options['authentication_ttl'] > 0) {
             if(array_key_exists('auth_time', $this->claims)) {
                 
                 $expirationAuthTime = new \DateTime();

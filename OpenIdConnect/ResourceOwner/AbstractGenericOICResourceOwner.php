@@ -100,7 +100,7 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
             'max_age' => $this->options['authentication_ttl']
         );
 
-        if ($this->options['authentication_ttl'] != null && $this->options['authentication_ttl'] > 0) {
+        if ($this->options['authentication_ttl'] !== null && $this->options['authentication_ttl'] > 0) {
             $urlParameters['max_age'] = $this->options['authentication_ttl'];
         }
 
