@@ -152,9 +152,10 @@ class OICResponseHandler
      * @return array
      */
     protected function getJwtEncodedContent($content)
-    {
+    {        
         $jwt = \JOSE_JWT::decode($content);
 
+      
         if (array_key_exists('jku', $jwt->header)) {
             $jwkSetJsonObject = $this->jwkHandler->getJwk();
 

@@ -18,6 +18,11 @@ interface ValidatorInterface
      * @return boolean
      */
     public function isValid();
+    
+    /**
+     * @return array
+     */
+    public function getErrors();
 
     /**
      * When a max_age request is made, the Client SHOULD check 

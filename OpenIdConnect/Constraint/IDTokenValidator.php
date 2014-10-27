@@ -15,6 +15,11 @@ class IDTokenValidator implements ValidatorInterface
     /**
      * @var array
      */
+    private $errors;
+
+    /**
+     * @var array
+     */
     private $options;
         
     /**
@@ -38,20 +43,28 @@ class IDTokenValidator implements ValidatorInterface
         $this->claims = is_object($idToken) ? $this->idToken->claims : $this->idToken['claims'];
     }
     
-    /**
+    public function getErrors()
+    {
+        return $this->errors;
+    }
+
+        /**
      * 
      * @param type $idToken
      * @return boolean
      */
     public function isValid()
     {        
-        $isValid = true;
+        $this->errors = array();
         
         /* 1. The Issuer Identifier for the OpenID Provider 
          * (which is typically obtained during Discovery) MUST exactly match 
          * the value of the iss (issuer) Claim. 
          */
-        $isValid &= $this->options['issuer'] === $this->claims['iss'];
+        if($this->options['issuer'] !== $this->claims['iss']) {
+            $this->errors[] = "Issuer are not the same";
+        }
+        
 
         /* 2. The Client MUST validate that the aud (audience) Claim contains 
          * its client_id value registered at the Issuer identified by the iss (issuer)
@@ -59,32 +72,42 @@ class IDTokenValidator implements ValidatorInterface
          * does not list the Client as a valid audience, or if it contains 
          * additional audiences not trusted by the Client. 
          */
-        $isValid &= $this->isClientIdInAudience($this->claims['aud']);
+        if(!$this->isClientIdInAudience($this->claims['aud'])) {
+            $this->errors[] = "The client does not validate the aud value";
+        }
         
         /* 3. If the ID Token contains multiple audiences, 
          * the Client SHOULD verify that an azp Claim is present. 
          */
-        $isValid &= $this->isMultipleAudienceValide($this->claims['aud']);
+        if(!$this->isMultipleAudienceValide($this->claims['aud'])) {
+            $this->errors[] = "The client's claim required an azp value";
+        }
 
         /* 4. If an azp (authorized party) Claim is present, 
          * the Client SHOULD verify that its client_id is the Claim Value.  
          */
         if(array_key_exists('azp', $this->claims)) {
-            $isValid &= $this->isClientIdInAudience($this->claims['azp']);
+            if(! $this->isClientIdInAudience($this->claims['azp'])) {
+                $this->errors[] = "The client's azp claim is not valid";
+            }
         }
 
         /* 5. The current time MUST be before the time represented by 
          * the exp Claim (possibly allowing for some small 
          * leeway to account for clock skew). 
          */
-        $isValid &= $this->isExpirationTimeValide();
+        if(!$this->isExpirationTimeValide()) {
+            $this->errors[] = "The client's expiration time is out of bound";
+        }
         
         /* 6. The iat Claim can be used to reject tokens that were issued 
          * too far away from the current time, limiting the amount of time that 
          * nonces need to be stored to prevent attacks.
          * The acceptable range is Client specific. 
          */
-        $isValid &= $this->isIatValide();
+        if(! $this->isIatValide()) {
+            $this->errors[] = "The client's iat value is not valid";
+        }
         
         /* 7. If the acr Claim was requested, the Client SHOULD check that 
          * the asserted Claim Value is appropriate. The meaning and processing 
@@ -97,9 +120,11 @@ class IDTokenValidator implements ValidatorInterface
          * determines too much time has elapsed since the last End-User 
          * authentication. 
          */
-        $isValid &= $this->isValidAuthTime() === false ? false : true;
+        if($this->isValidAuthTime() === false) {
+            $this->errors[] = "The client's auth_time time is out of bound";
+        }
 
-        return (bool) $isValid;
+        return (bool) count($this->errors) == 0;
     }
 
     public function isClientIdInAudience($aud)

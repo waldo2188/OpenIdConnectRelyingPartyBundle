@@ -221,21 +221,19 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
         $this->httpClient->send($request, $response);
         
         $content = $this->responseHandler->handleTokenAndAccessTokenResponse($response);
-       
+ 
+ 
         // Apply validation describe here: http://openid.net/specs/openid-connect-basic-1_0.html#IDTokenValidation
         $this->idTokenValidator->setIdToken($content['id_token']);
         if (!$this->idTokenValidator->isValid()) {
-            
-            // check if the user session has expired
-            if($this->idTokenValidator->isValidAuthTime() === false) {
-                throw new AuthenticationException("auth_time as expired, user must login");
-            }
+
+            $errors = sprintf("%s", implode(", ", $this->idTokenValidator->getErrors()));
             
             if($this->logger !== null) {
-                $this->logger->error("InvalidIdTokenException", $content);
+                $this->logger->error("InvalidIdTokenException " . $errors, $content);
             }
             
-            throw new InvalidIdTokenException();
+            throw new InvalidIdTokenException($errors);
             
         }
 
@@ -277,6 +275,8 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
         $response = new HttpClientResponse();
 
         $this->httpClient->send($request, $response);
+
+        
 
         $content = $this->responseHandler->handleEndUserinfoResponse($response);
                 

@@ -86,7 +86,7 @@ class AbstractGenericOICResourceOwnerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Exception\InvalidRequestException
-     * @expectedExceptionMessage "no such access_token"
+     * @expectedExceptionMessage no such access_token
      */
     public function testShouldFailAuthenticateUserNoSuchAccessToken()
     {
@@ -102,7 +102,7 @@ class AbstractGenericOICResourceOwnerTest extends \PHPUnit_Framework_TestCase
     
     /**
      * @expectedException Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Exception\InvalidIdTokenException
-     * @expectedExceptionMessage "The sub value is not equal"
+     * @expectedExceptionMessage The sub value is not equal
      */
     public function testShouldFailAuthenticateUserSubValueNotEqual()
     {
@@ -150,6 +150,9 @@ class AbstractGenericOICResourceOwnerTest extends \PHPUnit_Framework_TestCase
         $idTokenValidator->expects($this->any())
                 ->method('isValid')
                 ->willReturn($idTokenValidatorRV);
+        $idTokenValidator->expects($this->any())
+                ->method('getErrors')
+                ->willReturn(array());
         
         $responseHandler = $responseHandler ? $responseHandler : $this->getMockBuilder('Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect\Response\OICResponseHandler')
                 ->disableOriginalConstructor()->getMock();
