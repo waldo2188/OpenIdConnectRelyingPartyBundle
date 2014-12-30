@@ -96,8 +96,7 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
             'redirect_uri' => $this->httpUtils->generateUri($request, $redirectUri),
             'scope' => $this->options['scope'],
             'nonce' => $this->nonceHelper->buildNonceValue($request->getClientIp()),
-            'state' => $this->nonceHelper->buildNonceValue($request->getClientIp(), "state"),
-            'max_age' => $this->options['authentication_ttl']
+            'state' => $this->nonceHelper->buildNonceValue($request->getClientIp(), "state")
         );
 
         if ($this->options['authentication_ttl'] !== null && $this->options['authentication_ttl'] > 0) {
