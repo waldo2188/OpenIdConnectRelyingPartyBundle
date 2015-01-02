@@ -156,7 +156,12 @@ class OICResponseHandler
         $jwt = \JOSE_JWT::decode($content);
 
       
-        if (array_key_exists('jku', $jwt->header)) {
+        if (array_key_exists('alg', $jwt->header)) {
+            
+            if(array_key_exists('jku', $jwt->header)) {
+                
+            }
+            
             $jwkSetJsonObject = $this->jwkHandler->getJwk();
 
             if ($jwkSetJsonObject !== null) {
@@ -170,7 +175,7 @@ class OICResponseHandler
                     $jwk = $jwkSet->filterJwk("use", \JOSE_JWK::JWK_USE_SIG);
     
                     $jws->verify($jwk);
-                    
+                                    
                 } catch (\Exception $e) {
                     throw new OICException\InvalidIdSignatureException($e->getMessage());                    
                 }
