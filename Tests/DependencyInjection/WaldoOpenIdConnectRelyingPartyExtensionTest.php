@@ -69,8 +69,6 @@ http_client:
     proxy: localhost:8080
 jwk_url: http://issuer.com/op.jwk
 jwk_cache_ttl: 5
-userinfo_signed_response_alg: RSA512
-id_token_signed_response_alg: RSA256
 EOF;
         $parser = new Parser();
 

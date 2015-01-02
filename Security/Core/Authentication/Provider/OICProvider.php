@@ -5,6 +5,7 @@ namespace Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Authentication\Pr
 use Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Authentication\Token\OICToken;
 use Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\User\UserFactoryInterface;
 use Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect\ResourceOwnerInterface;
+use Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Exception\InvalidIdSignatureException;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -213,6 +214,10 @@ class OICProvider implements AuthenticationProviderInterface
                 throw new AuthenticationServiceException('The user provider must create an UserInterface object.');
                 
             }
+            
+        } catch (InvalidIdSignatureException $invalidIdSignatureException) {
+            
+            throw $invalidIdSignatureException;
             
         } catch (\Exception $repositoryProblem) {
             

@@ -6,7 +6,7 @@ use Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect\Response\OICResponseHan
 
 /**
  * OICResponseHandler
- *
+ * @group OICResponseHandler
  * @author valérian Girard <valerian.girard@educagri.fr>
  */
 class OICResponseHandlerTest extends \PHPUnit_Framework_TestCase
@@ -131,11 +131,11 @@ class OICResponseHandlerTest extends \PHPUnit_Framework_TestCase
         
         $header = array("HTTP/1.1 200 OK", "Content-Type: application/json");
         $response->addHeaders($header);
+
         $response->setContent($token);
 
         $oicResponseHandler = new OICResponseHandler(
-                $this->createJWKSetHandler(),
-                array('id_token_signed_response_alg' => $alg));
+                $this->createJWKSetHandler(), array());
         
         $res = $oicResponseHandler->handleTokenAndAccessTokenResponse($response);
         
@@ -153,7 +153,7 @@ class OICResponseHandlerTest extends \PHPUnit_Framework_TestCase
     public function tokendataProvider()
     {
         return array(
-            array("alg" => null, "token" => '{"access_token":"Q5GBZL9RmntEZDd88","token_type":"Bearer","expires_in":3600,"id_token":"{\"iss\":\"http:\\\/\\\/localhost\\\/phpOp\",\"sub\":\"1a08411743e829c787a0152d004c6d48a14e921ed5023a65bb39ad72661cca78\",\"aud\":[\"my_client_id\"],\"exp\":1409998468,\"iat\":1409998168,\"nonce\":\"Y2JlYzU2YmVmNjRmNWZiY2MxMDAyNzE0OGVlNjc3MmQtTVRJM0xqQXVNQzR4\",\"auth_time\":1409994839}"}'),
+            array("alg" => null, "token" => '{"access_token":"Q5GBZL9RmntEZDd88","token_type":"Bearer","expires_in":3600,"id_token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJpc3MiOiJodHRwOlxcXFwvXFxcXC9sb2NhbGhvc3RcXFxcL3BocE9wIiwic3ViIjoiMWEwODQxMTc0M2U4MjljNzg3YTAxNTJkMDA0YzZkNDhhMTRlOTIxZWQ1MDIzYTY1YmIzOWFkNzI2NjFjY2E3OCIsImF1ZCI6WyJteV9jbGllbnRfaWQiXSwiZXhwIjoxNDA5OTk4NDY4LCJpYXQiOjE0MDk5OTgxNjgsIm5vbmNlIjoiWTJKbFl6VTJZbVZtTmpSbU5XWmlZMk14TURBeU56RTBPR1ZsTmpjM01tUXRUVlJKTTB4cVFYVk5RelI0IiwiYXV0aF90aW1lIjoxNDA5OTk0ODM5fQ."}'),
             array("alg" => 'RS256', "token" => '{"access_token":"Q5GBZL9RmntEZDd88","token_type":"Bearer","expires_in":3600,"id_token":"eyJhbGciOiJSUzI1NiIsImprdSI6Imh0dHA6XC9cL2xvY2FsaG9zdFwvcGhwT3BcL29wLmp3ayIsImtpZCI6IlBIUE9QLTAwIn0.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3RcL3BocE9wIiwic3ViIjoiMWEwODQxMTc0M2U4MjljNzg3YTAxNTJkMDA0YzZkNDhhMTRlOTIxZWQ1MDIzYTY1YmIzOWFkNzI2NjFjY2E3OCIsImF1ZCI6WyJteV9jbGllbnRfaWQiXSwiZXhwIjoxNDA5OTk1NzM5LCJpYXQiOjE0MDk5OTU0MzksIm5vbmNlIjoiWlRreE9HSTNNamxsTkRBd00yRXhZMkZrWXpSbE5UUTBaalF6TmpFNE9URXRUVlJKTTB4cVFYVk5RelI0IiwiYXRfaGFzaCI6IjZaVVJUeFpEdGtSU2M5ZXlTNUxOSlEiLCJhdXRoX3RpbWUiOjE0MDk5OTQ4Mzl9.b2H0jQ0GFSB4XyFBN4Ktj8Jr6i64FEMw4V9bVATl3gaIIFCJ0D0EHLD2isQde-so7KGzfw2X3Vvc52Y2cMHwnbx9FInWInOHGSnxZXM6YjmQB05GMB_lpSmnPfsz0DR5q5ZVPiG2xaIrbBqJlsFFBr2znvE3I5tlWJYCPzK2lOA"}')
            );            
     }
@@ -168,7 +168,7 @@ class OICResponseHandlerTest extends \PHPUnit_Framework_TestCase
 
         $oicResponseHandler = new OICResponseHandler(
                 $this->createJWKSetHandler(),
-                array('id_token_signed_response_alg' => null));
+                array());
         
         $res = $oicResponseHandler->handleTokenAndAccessTokenResponse($response);
         
@@ -187,8 +187,7 @@ class OICResponseHandlerTest extends \PHPUnit_Framework_TestCase
         $response->setContent($content);
 
         $oicResponseHandler = new OICResponseHandler(
-                $this->createJWKSetHandler(),
-                array('userinfo_signed_response_alg' => $alg));
+                $this->createJWKSetHandler(), array());
         
         $res = $oicResponseHandler->handleEndUserinfoResponse($response);
         
@@ -218,7 +217,7 @@ class OICResponseHandlerTest extends \PHPUnit_Framework_TestCase
 
         $oicResponseHandler = new OICResponseHandler(
                 $this->createJWKSetHandler(),
-                array('userinfo_signed_response_alg' => 'RS256'));
+                array());
         
         $oicResponseHandler->handleEndUserinfoResponse($response);
     }
