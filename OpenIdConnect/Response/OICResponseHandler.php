@@ -78,8 +78,9 @@ class OICResponseHandler
      */
     public function handleTokenAndAccessTokenResponse(HttpClientResponse $response)
     {  
+
         $content = $this->handleHttpClientResponse($response);
-        
+
         if($content == "") {
             return $content;
         }
@@ -168,25 +169,35 @@ class OICResponseHandler
     protected function verifySignedJwt(\JOSE_JWT $jwt)
     {
         if (array_key_exists('alg', $jwt->header)) {
+                        
+            $key = null;
             
-            // TODO add the ability to use another jku. Don't forget the "kid" attribute.
-            // If the jku content more than one JWK, the KID must be used for select the right one
-            //if(array_key_exists('jku', $jwt->header))
+            // get the right key base on the algorithm
+            if(substr($jwt->header['alg'], 0, 2) == 'HS') {
+                
+                $key = $this->options['client_secret'];
+                
+            } elseif (substr($jwt->header['alg'], 0, 2) == 'RS') {
             
-            $jwkSetJsonObject = $this->jwkHandler->getJwk();
-
-            if ($jwkSetJsonObject !== null) {
+                // TODO add the ability to use another jku. Don't forget the "kid" attribute.
+                // If the jku content more than one JWK, the KID must be used for select the right one
+                //if(array_key_exists('jku', $jwt->header))
+                
+                $jwkSetJsonObject = $this->jwkHandler->getJwk();
                 $jwkSet = new \JOSE_JWKSet();
                 $jwkSet->setJwksFromJsonObject($jwkSetJsonObject);
+                $key = $jwkSet->filterJwk("use", \JOSE_JWK::JWK_USE_SIG);
+                
+            }
+
+            if ($key !== null) {
 
                 $jws = new \JOSE_JWS($jwt);
                 
                 try {
-                    
-                    $jwk = $jwkSet->filterJwk("use", \JOSE_JWK::JWK_USE_SIG);
     
-                    $jws->verify($jwk);
-                                    
+                    $jws->verify($key);
+                     
                 } catch (\Exception $e) {
                     throw new OICException\InvalidIdSignatureException($e->getMessage());                    
                 }
