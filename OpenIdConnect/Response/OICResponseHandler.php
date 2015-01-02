@@ -79,12 +79,19 @@ class OICResponseHandler
     public function handleTokenAndAccessTokenResponse(HttpClientResponse $response)
     {  
         $content = $this->handleHttpClientResponse($response);
-        
+
         if($content == "") {
             return $content;
         }
-        
-        $content['id_token'] = $this->getJwtEncodedContent($content['id_token']);      
+        if($this->isJson($content['id_token'])) {
+            
+            $jsonDecoded = $this->getJsonEncodedContent($content['id_token']);
+            
+            $content['id_token'] = new \JOSE_JWT($jsonDecoded); 
+                        
+        } else {
+            $content['id_token'] = $this->getJwtEncodedContent($content['id_token']);
+        }
         
         return $content;
     }
@@ -245,6 +252,12 @@ class OICResponseHandler
         }
         
         return false;
+    }
+
+    private function isJson($string)
+    {
+        json_decode($string);
+        return (json_last_error() == JSON_ERROR_NONE);
     }
 
 }
