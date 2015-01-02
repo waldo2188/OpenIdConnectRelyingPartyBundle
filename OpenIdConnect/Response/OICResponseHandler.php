@@ -105,13 +105,12 @@ class OICResponseHandler
     public function handleEndUserinfoResponse(HttpClientResponse $response)
     {  
         $content = $this->handleHttpClientResponse($response);
+        
         // Check if Userinfo Signed Response Alg
         if($this->options['userinfo_signed_response_alg'] !== null) {
             
-            
             if($content instanceof \JOSE_JWT) {
                 return $content->claims;
-                
             } else {
                 throw new OICException\InvalidIdSignatureException("Enduser signature is missing");
             }
@@ -154,8 +153,20 @@ class OICResponseHandler
     protected function getJwtEncodedContent($content)
     {        
         $jwt = \JOSE_JWT::decode($content);
-
-      
+        
+        $this->verifySignedJwt($jwt);
+        
+        return $jwt;
+    }
+    
+    /**
+     * Check the signature of an JSON Web Token if there is a signature
+     * @param JOSE_JWT $jwt
+     * @return JOSE_JWT
+     * @throws OICException\InvalidIdSignatureException
+     */
+    protected function verifySignedJwt(\JOSE_JWT $jwt)
+    {
         if (array_key_exists('alg', $jwt->header)) {
             
             // TODO add the ability to use another jku. Don't forget the "kid" attribute.
