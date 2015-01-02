@@ -158,9 +158,9 @@ class OICResponseHandler
       
         if (array_key_exists('alg', $jwt->header)) {
             
-            if(array_key_exists('jku', $jwt->header)) {
-                
-            }
+            // TODO add the ability to use another jku. Don't forget the "kid" attribute.
+            // If the jku content more than one JWK, the KID must be used for select the right one
+            //if(array_key_exists('jku', $jwt->header))
             
             $jwkSetJsonObject = $this->jwkHandler->getJwk();
 
