@@ -47,6 +47,8 @@ waldo_oic_rp:
     id_token_signed_response_alg: null #Algorihme for signing tokenID response (RS256)
     jwk_url: https://openid-connect-provider.tld/op.jwk #URL to the Json Web Key of OpenID Connect Provider
     jwk_cache_ttl 86400             #Validity periods in second where the JWK store in cache is valid
+    enabled_state: true             #Enable the use of the state value. This is useful for mitigate replay attack
+    enabled_nonce: true             #Enable the use of the nonce value. This is useful for mitigate replay attack
 ```
 
 I recommend you to set a path for `default_target_path`. Because you risk to 

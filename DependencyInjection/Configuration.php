@@ -48,6 +48,7 @@ class Configuration implements ConfigurationInterface
 
         $this->addHttpClientConfiguration($rootNode);
         $this->addSignatureConfiguration($rootNode);
+        $this->addReplayAttackParadeConfiguration($rootNode);
         
         $rootNode
             ->children()
@@ -176,6 +177,16 @@ class Configuration implements ConfigurationInterface
                 // @see http://openid.net/specs/openid-connect-registration-1_0.html#ClientMetadata
                 ->scalarNode('userinfo_signed_response_alg')->defaultNull()->end()
                 ->scalarNode('id_token_signed_response_alg')->defaultNull()->end()
+            ->end()
+        ;
+    }
+
+    private function addReplayAttackParadeConfiguration(ArrayNodeDefinition $node)
+    {
+        $node
+            ->children()
+                ->scalarNode('enabled_state')->defaultTrue()->end()
+                ->scalarNode('enabled_nonce')->defaultTrue()->end()
             ->end()
         ;
     }

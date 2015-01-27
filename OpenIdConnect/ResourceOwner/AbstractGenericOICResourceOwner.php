@@ -9,6 +9,7 @@ use Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Exception\InvalidReques
 use Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect\Constraint\ValidatorInterface;
 use Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect\Response\OICResponseHandler;
 use Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect\NonceHelper;
+use Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Exception\InvalidAuthorizationCodeException;
 use Buzz\Client\AbstractCurl;
 use Buzz\Message\Request as HttpClientRequest;
 use Buzz\Message\Response as HttpClientResponse;
@@ -95,11 +96,19 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
             'response_type' => 'code',
             'redirect_uri' => $this->httpUtils->generateUri($request, $redirectUri),
             'scope' => $this->options['scope'],
-            'nonce' => $this->nonceHelper->buildNonceValue($request->getClientIp()),
-            'state' => $this->nonceHelper->buildNonceValue($request->getClientIp(), "state"),
+//            'nonce' => $this->nonceHelper->buildNonceValue($request->getClientIp()),
+//            'state' => $this->nonceHelper->buildNonceValue($request->getClientIp(), "state"),
             'max_age' => $this->options['authentication_ttl']
         );
 
+        if($this->nonceHelper->isNonceEnabled()) {
+            $urlParameters['nonce'] = $this->nonceHelper->buildNonceValue($request->getClientIp());
+        }
+        
+        if($this->nonceHelper->isStateEnabled()) {
+            $urlParameters['state'] = $this->nonceHelper->buildNonceValue($request->getClientIp(), "state");
+        }
+        
         if ($this->options['authentication_ttl'] !== null && $this->options['authentication_ttl'] > 0) {
             $urlParameters['max_age'] = $this->options['authentication_ttl'];
         }
@@ -172,7 +181,6 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
         );
         
         $this->retrieveIdTokenAndAccessToken($oicToken, $postParameters);
-        
     }
     
     /**
@@ -220,9 +228,8 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
         $this->httpClient->setOption(CURLOPT_USERPWD, $this->options['client_id'] . ':' . $this->options['client_secret']);
         $this->httpClient->send($request, $response);
         
-        $content = $this->responseHandler->handleTokenAndAccessTokenResponse($response);
- 
- 
+        $content = $this->responseHandler->handleTokenAndAccessTokenResponse($response);            
+        
         // Apply validation describe here: http://openid.net/specs/openid-connect-basic-1_0.html#IDTokenValidation
         $this->idTokenValidator->setIdToken($content['id_token']);
         if (!$this->idTokenValidator->isValid()) {
@@ -236,7 +243,7 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
             throw new InvalidIdTokenException($errors);
             
         }
-
+        
         $oicToken->setRawTokenData($content);
     }
 
@@ -273,13 +280,11 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
         $request->setHeaders($headers);
 
         $response = new HttpClientResponse();
-
+        
         $this->httpClient->send($request, $response);
 
-        
-
         $content = $this->responseHandler->handleEndUserinfoResponse($response);
-                
+
         // Check if the sub value return by the OpenID connect Provider is the 
         // same as previous. If Not, that isn't good...
         if ($content['sub'] !== $oicToken->getIdToken()->claims['sub']) {
@@ -291,6 +296,7 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
         }
         
         $oicToken->setRawUserinfo($content);
+        
 
         return $content;
     }

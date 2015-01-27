@@ -18,10 +18,16 @@ class NonceHelper
      * @var SessionInterface
      */
     private $session;
+    
+    /**
+     * @var array
+     */
+    private $config;
 
-    public function __construct(SessionInterface $session)
+    public function __construct(SessionInterface $session, $config)
     {
         $this->session = $session;
+        $this->config = $config;
     }
 
     /**
@@ -48,7 +54,15 @@ class NonceHelper
      */
     public function checkStateAndNonce(Request $request)
     {
-        foreach (array("state", "nonce") as $type) {
+        $checkList = array();
+        if($this->isNonceEnabled()) {
+            $checkList[] = "nonce";
+        }
+        if($this->isStateEnabled()) {
+            $checkList[] = "state";
+        }
+        
+        foreach ($checkList as $type) {
             if ($request->query->has($type)) {
 
                 if (!$this->isNonceValid($type, $request->query->get($type))) {
@@ -105,4 +119,19 @@ class NonceHelper
         return false;
     }
 
+    /**
+     * @return boolean
+     */
+    public function isNonceEnabled()
+    {
+        return $this->config['nonce'] === true;
+    }
+    
+    /**
+     * @return boolean
+     */
+    public function isStateEnabled()
+    {
+        return $this->config['state'] === true;
+    }
 }

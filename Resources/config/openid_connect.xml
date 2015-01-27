@@ -53,6 +53,7 @@
         
         <service id="waldo_oic_rp.helper.nonce" class="%waldo_oic_rp.helper.nonce.class%">
             <argument type="service" id="session" />
+            <argument type="collection" />
         </service>
         
         <!-- User provider -->

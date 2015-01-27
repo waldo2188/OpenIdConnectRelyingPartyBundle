@@ -18,7 +18,7 @@ class NonceHelperTest extends \PHPUnit_Framework_TestCase
                 ->method('set')
                 ->with($this->equalTo("auth.oic.test"), $this->anything());
         
-        $nonceHelper = new NonceHelper($ession);
+        $nonceHelper = new NonceHelper($ession, array("nonce" => true, "state" => true));
         
         $nonce = $nonceHelper->buildNonceValue("amy", 'test');
                 
@@ -33,7 +33,7 @@ class NonceHelperTest extends \PHPUnit_Framework_TestCase
                 ->method('set')
                 ->with($this->equalTo("auth.oic.test"), $this->anything());
         
-        $nonceHelper = new NonceHelper($ession);
+        $nonceHelper = new NonceHelper($ession, array("nonce" => true, "state" => true));
         
         $nonce = $nonceHelper->buildNonceValue(hash('SHA512', "amy") . hash('SHA512', "amy"), 'test');
                 
@@ -51,7 +51,7 @@ class NonceHelperTest extends \PHPUnit_Framework_TestCase
         $ession->expects($this->exactly(2))
                 ->method('get')
                 ->willReturn(serialize('unevaleur'));
-        $nonceHelper = new NonceHelper($ession);
+        $nonceHelper = new NonceHelper($ession, array("nonce" => true, "state" => true));
         
         $nonceHelper->checkStateAndNonce($request);
     }
@@ -69,7 +69,7 @@ class NonceHelperTest extends \PHPUnit_Framework_TestCase
         $ession->expects($this->once())
                 ->method('get')
                 ->willReturn(serialize('error'));
-        $nonceHelper = new NonceHelper($ession);
+        $nonceHelper = new NonceHelper($ession, array("nonce" => true, "state" => true));
         
         $nonceHelper->checkStateAndNonce($request);
     }   

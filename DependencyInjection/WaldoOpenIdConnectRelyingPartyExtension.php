@@ -28,6 +28,7 @@ class WaldoOpenIdConnectRelyingPartyExtension extends Extension
         $loader->load('openid_connect.xml');
         $loader->load('buzz.xml');
 
+
         $this->constructEndpointUrl($config);
 
         $this->configureBuzz($container, $config);      
@@ -42,6 +43,13 @@ class WaldoOpenIdConnectRelyingPartyExtension extends Extension
 
         $container->getDefinition('waldo_oic_rp.http_client_response_handler')
                 ->replaceArgument(1, $config);
+        
+        
+        $container->getDefinition('waldo_oic_rp.helper.nonce')
+                ->replaceArgument(1, array(
+                    "state" => $config['enabled_state'],
+                    "nonce" => $config['enabled_nonce']
+                ));
 
         $name = 'generic';
         $this->createResoucerOwnerService($container, $name, $config);
