@@ -43,8 +43,6 @@ waldo_oic_rp:
     scope: openid profile email address phone #List of the scope you need
     authentication_ttl: 300         #Maximum age of the authentication
     token_ttl: 300                  #Maximum age for tokenID
-    userinfo_signed_response_alg: null #Algorihme for signing userinfo response (RS256)
-    id_token_signed_response_alg: null #Algorihme for signing tokenID response (RS256)
     jwk_url: https://openid-connect-provider.tld/op.jwk #URL to the Json Web Key of OpenID Connect Provider
     jwk_cache_ttl 86400             #Validity periods in second where the JWK store in cache is valid
     enabled_state: true             #Enable the use of the state value. This is useful for mitigate replay attack

@@ -175,8 +175,6 @@ class Configuration implements ConfigurationInterface
                 // Validity periods in second where the JWK is valid
                 ->scalarNode('jwk_cache_ttl')->defaultValue(86400)->end()
                 // @see http://openid.net/specs/openid-connect-registration-1_0.html#ClientMetadata
-                ->scalarNode('userinfo_signed_response_alg')->defaultNull()->end()
-                ->scalarNode('id_token_signed_response_alg')->defaultNull()->end()
             ->end()
         ;
     }

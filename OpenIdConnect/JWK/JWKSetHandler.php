@@ -50,13 +50,15 @@ class JWKSetHandler
         $this->httpClient = $httpClient;
     }
 
-    public function getJwk()
+    public function getJwk($jku = null)
     {
-        if($this->jwkUrl === null) {
+        if($jku === null && $this->jwkUrl === null) {
             return false;
+        } else if($jku === null && $this->jwkUrl !== null) {
+            $jku = $this->jwkUrl;
         }
         
-        $this->refreshCache();
+        $this->refreshCache($jku);
         
         $content = file_get_contents($this->cacheDir . $this->jwkFileFolder . $this->jwkFileName);
  
@@ -66,9 +68,11 @@ class JWKSetHandler
         return $content;
     }
 
-    private function refreshCache()
+    private function refreshCache($url)
     {
         $fs = new Filesystem();
+        
+        $this->jwkFileName = md5($url);
         
         if(!$fs->exists($this->cacheDir . $this->jwkFileFolder . $this->jwkFileName)) {
             $fs->mkdir($this->cacheDir . $this->jwkFileFolder);

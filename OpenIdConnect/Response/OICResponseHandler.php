@@ -50,7 +50,7 @@ class OICResponseHandler
     public function handleHttpClientResponse(HttpClientResponse $response)
     {  
         $content = $this->getContent($response);
-
+        
         if($response->getStatusCode() >= Response::HTTP_UNAUTHORIZED) {
             if(($authError = $response->getHeader("WWW-Authenticate")) !== null){
                 preg_match ('/^Basic realm="(.*)"$/', $authError, $matches);
@@ -79,19 +79,20 @@ class OICResponseHandler
     public function handleTokenAndAccessTokenResponse(HttpClientResponse $response)
     {  
         $content = $this->handleHttpClientResponse($response);
-        
+
         if($content == "") {
             return $content;
         }
-
-        if($this->options['id_token_signed_response_alg'] !== null) {
-            $content['id_token'] = $this->getJwtEncodedContent($content['id_token']);
+        if($this->isJson($content['id_token'])) {
+            
+            $jsonDecoded = $this->getJsonEncodedContent($content['id_token']);
+            
+            $content['id_token'] = new \JOSE_JWT($jsonDecoded); 
+                        
         } else {
-            $jsonDecode = new JsonDecode(true);
-            $claims = $jsonDecode->decode($content['id_token'], JsonEncoder::FORMAT);
-            $content['id_token'] = new \JOSE_JWT($claims);
+            $content['id_token'] = $this->getJwtEncodedContent($content['id_token']);
         }
-
+        
         return $content;
     }
     
@@ -105,19 +106,14 @@ class OICResponseHandler
     public function handleEndUserinfoResponse(HttpClientResponse $response)
     {  
         $content = $this->handleHttpClientResponse($response);
-        // Check if Userinfo Signed Response Alg
-        if($this->options['userinfo_signed_response_alg'] !== null) {
-            
-            
-            if($content instanceof \JOSE_JWT) {
-                return $content->claims;
-                
-            } else {
-                throw new OICException\InvalidIdSignatureException("Enduser signature is missing");
-            }
+
+        if(!$content instanceof \JOSE_JWT) {
+            return $content;
         }
-        
-        return $content;        
+  
+        $this->verifySignedJwt($content);
+      
+        return $content->claims;
     }
     
     
@@ -152,25 +148,52 @@ class OICResponseHandler
      * @return array
      */
     protected function getJwtEncodedContent($content)
-    {        
+    {   
         $jwt = \JOSE_JWT::decode($content);
-
-      
-        if (array_key_exists('jku', $jwt->header)) {
-            $jwkSetJsonObject = $this->jwkHandler->getJwk();
-
-            if ($jwkSetJsonObject !== null) {
+        
+        $this->verifySignedJwt($jwt);
+        
+        return $jwt;
+    }
+    
+    /**
+     * Check the signature of an JSON Web Token if there is a signature
+     * @param JOSE_JWT $jwt
+     * @return JOSE_JWT
+     * @throws OICException\InvalidIdSignatureException
+     */
+    protected function verifySignedJwt(\JOSE_JWT $jwt)
+    {
+        if (array_key_exists('alg', $jwt->header)) {
+                        
+            $key = null;
+            
+            // get the right key base on the algorithm
+            if(substr($jwt->header['alg'], 0, 2) == 'HS') {
+                
+                $key = $this->options['client_secret'];
+                
+            } elseif (substr($jwt->header['alg'], 0, 2) == 'RS') {
+            
+                // TODO add the ability to use another jku. Don't forget the "kid" attribute.
+                // If the jku content more than one JWK, the KID must be used for select the right one
+                //if(array_key_exists('jku', $jwt->header))
+                
+                $jwkSetJsonObject = $this->jwkHandler->getJwk();
                 $jwkSet = new \JOSE_JWKSet();
                 $jwkSet->setJwksFromJsonObject($jwkSetJsonObject);
+                $key = $jwkSet->filterJwk("use", \JOSE_JWK::JWK_USE_SIG);
+                
+            }
+
+            if ($key !== null) {
 
                 $jws = new \JOSE_JWS($jwt);
                 
                 try {
-                    
-                    $jwk = $jwkSet->filterJwk("use", \JOSE_JWK::JWK_USE_SIG);
     
-                    $jws->verify($jwk);
-                    
+                    $jws->verify($key);
+                     
                 } catch (\Exception $e) {
                     throw new OICException\InvalidIdSignatureException($e->getMessage());                    
                 }
@@ -229,6 +252,12 @@ class OICResponseHandler
         }
         
         return false;
+    }
+
+    private function isJson($string)
+    {
+        json_decode($string);
+        return (json_last_error() == JSON_ERROR_NONE);
     }
 
 }
