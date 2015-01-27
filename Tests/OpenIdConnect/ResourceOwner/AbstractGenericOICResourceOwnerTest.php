@@ -173,6 +173,7 @@ class AbstractGenericOICResourceOwnerTest extends \PHPUnit_Framework_TestCase
                     "scope" => "openid profil other",
                     "authentication_ttl" => "300",
                     "ui_locales" => "F_fr",
+                    "enduserinfo_request_method" => "POST",
                     "endpoints_url" => array(
                         "authorization" => "http://oic.com/auth",
                         "token" => "http://oic.com/token",

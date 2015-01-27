@@ -13,6 +13,15 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
  */
 class Configuration implements ConfigurationInterface
 {
+    public static function isHttpMethodSupproted($display)
+    {
+        $displays = array(
+            'POST',
+            'GET'
+            );
+        
+        return in_array($display, $displays);
+    }
     public static function isDisplaySupproted($display)
     {
         $displays = array(
@@ -77,6 +86,17 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('authentication_ttl')->defaultValue(300)->end()
                 // @see http://openid.net/specs/openid-connect-core-1_0.html#AuthRequest
                 ->scalarNode('ui_locales')->end()
+                
+                // Define the method (POST, GET) used to request the Enduserinfo Endpoint of the OIDC Provider
+                ->scalarNode('enduserinfo_request_method')
+                        ->validate()
+                        ->ifTrue(function($display) {
+                            return !Configuration::isHttpMethodSupproted($display);
+                        })
+                        ->thenInvalid('Unknown request mathod "%s".')
+                    ->end()
+                    ->defaultValue("POST")->end()
+                
                 // ASCII string value that specifies how the Authorization Server
                 // displays the authentication and consent user interface pages 
                 // to the End-User. The defined values are: 
@@ -175,6 +195,8 @@ class Configuration implements ConfigurationInterface
                 // Validity periods in second where the JWK is valid
                 ->scalarNode('jwk_cache_ttl')->defaultValue(86400)->end()
                 // @see http://openid.net/specs/openid-connect-registration-1_0.html#ClientMetadata
+                ->scalarNode('userinfo_signed_response_alg')->defaultNull()->end()
+                ->scalarNode('id_token_signed_response_alg')->defaultNull()->end()
             ->end()
         ;
     }

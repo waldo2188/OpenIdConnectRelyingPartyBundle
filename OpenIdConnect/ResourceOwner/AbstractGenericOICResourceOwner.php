@@ -273,7 +273,10 @@ abstract class AbstractGenericOICResourceOwner implements ResourceOwnerInterface
         );
 
         $request = new HttpClientRequest(
-                RequestInterface::METHOD_POST, $this->getUserinfoEndpointUrl());
+                ($this->options['enduserinfo_request_method'] == RequestInterface::METHOD_POST
+                ? RequestInterface::METHOD_POST
+                : RequestInterface::METHOD_GET),
+                $this->getUserinfoEndpointUrl());
 
         $request->setHeaders($headers);
 

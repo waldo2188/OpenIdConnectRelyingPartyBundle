@@ -125,11 +125,11 @@ class OICResponseHandler
      */
     protected function getContent(HttpClientResponse $response)
     {
-        switch ($response->getHeader("Content-Type")) {
-            case 'application/json': return $this->getJsonEncodedContent($response->getContent());
-                break;
-            case 'application/jwt': return $this->getJwtEncodedContent($response->getContent());
-                break;
+        $contentType = explode(';', $response->getHeader("Content-Type"));
+        if(in_array('application/json', $contentType)) {
+            return $this->getJsonEncodedContent($response->getContent());
+        } elseif(in_array('application/jwt', $contentType)) {
+            return $this->getJwtEncodedContent($response->getContent());
         }
     }
     

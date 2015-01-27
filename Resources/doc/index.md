@@ -47,6 +47,7 @@ waldo_oic_rp:
     jwk_cache_ttl 86400             #Validity periods in second where the JWK store in cache is valid
     enabled_state: true             #Enable the use of the state value. This is useful for mitigate replay attack
     enabled_nonce: true             #Enable the use of the nonce value. This is useful for mitigate replay attack
+    enduserinfo_request_method: POST#Define the method (POST, GET) used to request the Enduserinfo Endpoint of the OIDC Provider
 ```
 
 I recommend you to set a path for `default_target_path`. Because you risk to 
@@ -102,7 +103,7 @@ he will be automatically  redirected to the OpenId Connect Provider's login page
 
 ###TODO
  - Add logout mechanism
- - Add re-authentication mechanism
+ - Add re-authentication mechanise
 
 ###Not yet implemented
 #####Client Prepares Authentication Request
