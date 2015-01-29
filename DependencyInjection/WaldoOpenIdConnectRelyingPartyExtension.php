@@ -25,6 +25,7 @@ class WaldoOpenIdConnectRelyingPartyExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader->load('services.xml');
         $loader->load('openid_connect.xml');
         $loader->load('buzz.xml');
 
@@ -53,6 +54,13 @@ class WaldoOpenIdConnectRelyingPartyExtension extends Extension
 
         $name = 'generic';
         $this->createResoucerOwnerService($container, $name, $config);
+        
+        //Logout
+        if($config['redirect_after_logout'] === null) {
+           $config['redirect_after_logout'] = $config['base_url'];
+        }
+        $container->getDefinition('waldo_oic_rp.logout')
+                ->replaceArgument(0, $config);
     }
 
     /**

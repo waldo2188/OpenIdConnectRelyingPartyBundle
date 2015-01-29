@@ -39,6 +39,7 @@ waldo_oic_rp:
         authorization: /auth
         token: /token
         userinfo: /userinfo
+        logout: /logout
     display: page                   #How the authentication form will be display to the enduser
     scope: openid profile email address phone #List of the scope you need
     authentication_ttl: 300         #Maximum age of the authentication
@@ -48,7 +49,21 @@ waldo_oic_rp:
     enabled_state: true             #Enable the use of the state value. This is useful for mitigate replay attack
     enabled_nonce: true             #Enable the use of the nonce value. This is useful for mitigate replay attack
     enduserinfo_request_method: POST#Define the method (POST, GET) used to request the Enduserinfo Endpoint of the OIDC Provider
+    redirect_after_logout           #URI or route name used for redirect user after a logout
 ```
+
+You must add this to your `/app/config/routing.yml`
+```yaml
+#/app/config/routing.yml
+_oic_rp:
+    resource: "@WaldoOpenIdConnectRelyingPartyBundle/Resources/config/routing.yml"
+
+#Set a path for the route name 'login_check'
+#You don't need to provide a controller for this route
+login_check:
+    path: /login_check
+```
+
 
 I recommend you to set a path for `default_target_path`. Because you risk to 
 suffer redirection loop.
@@ -84,13 +99,6 @@ security:
         - { path: ^/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
 ```
 
-```ỳaml
-#/app/config/routing.ylml
-#Set a path for the route name 'login_check'
-#You don't need to provide a controller for this route
-login_check:
-    path: /login_check
-```
 
 What is the link for login enduser ?
 ------------------------------------
@@ -100,9 +108,17 @@ he will be automatically  redirected to the OpenId Connect Provider's login page
 - The second. You can create a login link with the route 'login_check'
 
 
+How to display a logout link ?
+------------------------------
+The name of the logout route is `_oic_rp_logout`. You can use it in your Twig template like below : 
+
+```twig
+<a href="{{ path('_oic_rp_logout') }}">Logout</a>
+```
+If you have specified a logout endpoint, the logout mecanisme will proceed of the logout the user on the endpoint.
+
 
 ###TODO
- - Add logout mechanism
  - Add re-authentication mechanise
 
 ###Not yet implemented

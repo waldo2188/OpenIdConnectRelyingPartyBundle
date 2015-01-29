@@ -12,6 +12,8 @@
         
         <parameter key="waldo_oic_rp.user.provider.class">Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\User\OICUserProvider</parameter>
         
+        <parameter key="waldo_oic_rp.logout.class">Waldo\OpenIdConnect\RelyingPartyBundle\Security\Http\Logout\OICLogout</parameter>
+        
         <parameter key="waldo_oic_rp.abstract_resource_owner.generic.class">Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect\ResourceOwner\AbstractGenericOICResourceOwner</parameter>
         <parameter key="waldo_oic_rp.resource_owner.generic.class">Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect\ResourceOwner\GenericOICResourceOwner</parameter>
         
@@ -33,6 +35,13 @@
         
         <service id="waldo_oic_rp.authentication.entrypoint" class="%waldo_oic_rp.authentication.entrypoint.class%" public="false" abstract="true">
             <argument type="service" id="security.http_utils" />
+        </service>
+        
+        <service id="waldo_oic_rp.logout" class="%waldo_oic_rp.logout.class%">
+            <argument type="collection" /><!-- options -->
+            <argument type="service" id="security.token_storage" />
+            <argument type="service" id="security.http_utils" />
+            <argument type="service" id="router" />
         </service>
         
         <service id="waldo_oic_rp.validator.id_token" class="%waldo_oic_rp.validator.id_token.class%">

@@ -62,6 +62,8 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('base_url')->end()
+                // URI where the user is redirected after a logout
+                ->scalarNode('redirect_after_logout')->defaultNull()->end()
                 ->scalarNode('client_id')->cannotBeEmpty()->end()
                 ->scalarNode('client_secret')->cannotBeEmpty()->end()
                 // issuer is the URL of the OpenId Connect Provider
@@ -153,6 +155,14 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                             ->scalarNode('userinfo')
+                                ->validate()
+                                    ->ifTrue(function($v) {
+                                        return empty($v);
+                                    })
+                                    ->thenUnset()
+                                ->end()
+                            ->end()
+                            ->scalarNode('logout')
                                 ->validate()
                                     ->ifTrue(function($v) {
                                         return empty($v);
