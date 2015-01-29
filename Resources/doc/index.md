@@ -28,9 +28,9 @@ Add the code below to your composer.json
 waldo_oic_rp:
     http_client:                    #Configuration for Buzz
         timeout: 5
-        verify_peer: null
+        verify_peer: ~
         max_redirects: 5
-        proxy: null
+        proxy: ~
     base_url: http://my-web-site.tld/
     client_id: my_client_id         #OpenID Connect client id given by the OpenId Connect Provider
     client_secret: my_client_secret #OpenID Connect client secret given by the OpenId Connect Provider
