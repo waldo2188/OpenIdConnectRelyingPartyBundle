@@ -9,7 +9,6 @@ use Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Exception\InvalidReques
 use Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect\Constraint\ValidatorInterface;
 use Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect\Response\OICResponseHandler;
 use Waldo\OpenIdConnect\RelyingPartyBundle\OpenIdConnect\NonceHelper;
-use Waldo\OpenIdConnect\RelyingPartyBundle\Security\Core\Exception\InvalidAuthorizationCodeException;
 use Buzz\Client\AbstractCurl;
 use Buzz\Message\Request as HttpClientRequest;
 use Buzz\Message\Response as HttpClientResponse;
@@ -17,7 +16,6 @@ use Buzz\Message\RequestInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Psr\Log\LoggerInterface;
 /**
  * GenericOICResourceOwner
