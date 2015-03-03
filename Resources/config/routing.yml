@@ -1,4 +1,3 @@
 waldo_oic_rp_Routing:
     resource: .
     type: oic_routing
-    
