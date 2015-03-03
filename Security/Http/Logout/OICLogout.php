@@ -53,22 +53,18 @@ class OICLogout
         $request->getSession()->clear();
         $request->getSession()->invalidate();
         $this->tokenStorage->setToken(null);
-        
-        echo "<pre>:";
-        var_dump($request->server->get("HTTP_REFERER"));
-        echo "</pre>";exit;
-
-
-
+ 
+        $redirectResponse = new RedirectResponse($this->getRedirectAfterLogoutURI($request));
+ 
         if($request->server->get("HTTP_REFERER") != $this->httpUtils->generateUri($request, "_oic_rp_logout")) {
-            return new RedirectResponse($this->getRedirectAfterLogoutURI($request));
+            $redirectResponse = new RedirectResponse($this->getRedirectAfterLogoutURI($request));
         }
         
         if(array_key_exists("logout", $this->options['endpoints_url'])) {
-            return new RedirectResponse($this->getOIDCLogoutEndPointURI($request));
+            $redirectResponse = new RedirectResponse($this->getOIDCLogoutEndPointURI($request));
         }        
         
-        return new RedirectResponse($this->getRedirectAfterLogoutURI($request));
+        return $redirectResponse;
     }
     
     private function getRedirectAfterLogoutURI(Request $request)
