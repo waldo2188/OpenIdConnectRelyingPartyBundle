@@ -22,7 +22,7 @@
     },
     "require": {
         "php": ">=5.3.3",
-        "symfony/symfony": ">=2.3",
+        "symfony/symfony": ">=2.6",
         "kriswallsmith/buzz": "~0.7",
         "gree/jose": "0.2.*"
     },
