@@ -106,7 +106,7 @@ class JWKSetHandler
     
     private function makeCache()
     {
-        $request = new HttpClientRequest(RequestInterface::METHOD_POST, $this->jwkUrl);        
+        $request = new HttpClientRequest(RequestInterface::METHOD_GET, $this->jwkUrl);        
         $response = new HttpClientResponse();
         $this->httpClient->send($request, $response);
         
