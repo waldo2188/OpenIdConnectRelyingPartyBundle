@@ -6,7 +6,7 @@ With Composer
 Add the code below to your composer.json
 ```yaml
     "require": {
-        "gree/jose": "0.1.7",
+        "gree/jose": "0.2.*",
         "waldo/openid-connect-relying-party-bundle": "dev-master"
     },
     "repositories": [
