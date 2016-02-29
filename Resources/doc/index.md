@@ -21,6 +21,23 @@ Add the code below to your composer.json
     ]
 ```
 
+## Bundle registration
+
+Register the bundle in the kernel:
+
+``` php
+<?php
+// app/AppKernel.php
+
+public function registerBundles()
+{
+    $bundles = array(
+        // ...
+        new Waldo\OpenIdConnect\RelyingPartyBundle\WaldoOpenIdConnectRelyingPartyBundle(),
+    );
+}
+```
+
 ## Configurations
 ```yaml
 #/app/config/config.yml
