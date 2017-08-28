@@ -143,7 +143,7 @@ If you have specified a logout endpoint, the logout mecanisme will proceed of th
 
 http://openid.net/specs/openid-connect-basic-1_0.html#AuthenticationRequest
 
-This options parrameter need to be implemented
+This options parameter need to be implemented
  - claims_locales
  - id_token_hint
  - login_hint
